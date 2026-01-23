@@ -1,5 +1,5 @@
 # Vayan metiendo su primer cambio aquí, su nombre
-alumnos = ["Badel", "justin","Gerard"]
+alumnos = ["Badel", "justin", "Noa, Gerard"]
 
 # Formatear la lista de alumnos
 if len(alumnos) == 1:
