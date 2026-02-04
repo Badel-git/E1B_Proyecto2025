@@ -1,116 +1,137 @@
 import arcade
 
 # ---------------- CONSTANTES ----------------
-# Definimos el tamaño de la ventana y de las casillas. 
-# Usar constantes permite cambiar el diseño rápidamente sin tocar la lógica.
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
-SCREEN_TITLE = "La Oca de Sagaseta - Espiral Clásica"
+SCREEN_TITLE = "La Oca de Sagaseta - Fichas en Movimiento"
 
-CELL_SIZE = 90  # Tamaño en píxeles de cada lado de la casilla
-MARGIN = 5     # Espacio de separación entre casillas
+CELL_SIZE = 90
+MARGIN = 5
+
+# Colores para los 4 jugadores
+PLAYER_COLORS = [
+    arcade.color.RED,
+    arcade.color.BLUE,
+    arcade.color.YELLOW,
+    arcade.color.PURPLE
+]
+
+class Ficha:
+    def __init__(self, ID, color):
+        self.ID = ID
+        self.color = color
+        self.casilla_actual = 0  # Comienzan fuera del tablero (casilla 0)
+        self.radio = 15          # Tamaño de la ficha
 
 class OcaGame(arcade.Window):
     def __init__(self):
-        # Inicializamos la ventana con las constantes de arriba
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-        # Color de fondo de la ventana (el lienzo sobre el que dibujamos)
         arcade.set_background_color(arcade.color.WHITE)
         
-        # Lista vacía donde guardaremos las coordenadas (x, y) y el número de cada casilla
         self.camino = []
-        # Llamamos a la función que calcula las posiciones
         self.generar_espiral()
 
+        # 1. Creamos los 4 jugadores
+        self.jugadores = [Ficha(i, PLAYER_COLORS[i]) for i in range(4)]
+        self.turno_actual = 0  # Índice del jugador que le toca mover
+
     def generar_espiral(self):
-        """Lógica para calcular las posiciones en forma de espiral hacia adentro."""
-        total_casillas = 36 # Tablero de 6x6
-        
-        # Estos índices controlan los límites de la espiral que se van cerrando
+        """Calcula las posiciones en espiral (tu lógica original)."""
+        total_casillas = 36
         col_inicio, col_fin = 0, 5
         fila_inicio, fila_fin = 0, 5
+        n = 1
         
-        n = 1 # Contador para el número de la casilla (del 1 al 36)
-        
-        # El bucle continúa hasta que hayamos calculado las 36 posiciones
         while n <= total_casillas:
-            
-            # 1. MOVIENDO A LA DERECHA (Fila superior)
-            # Recorre las columnas de la fila superior actual
             for i in range(col_inicio, col_fin + 1):
                 if n > total_casillas: break
                 self.camino.append((i, fila_inicio, n))
                 n += 1
-            # Como ya llenamos la fila de arriba, el siguiente límite superior baja una fila
             fila_inicio += 1
-
-            # 2. MOVIENDO HACIA ABAJO (Columna derecha)
-            # Recorre las filas de la columna derecha actual
             for i in range(fila_inicio, fila_fin + 1):
                 if n > total_casillas: break
                 self.camino.append((col_fin, i, n))
                 n += 1
-            # El límite derecho se mueve una columna a la izquierda
             col_fin -= 1
-
-            # 3. MOVIENDO A LA IZQUIERDA (Fila inferior)
-            # Recorre hacia atrás las columnas de la fila inferior actual
             for i in range(col_fin, col_inicio - 1, -1):
                 if n > total_casillas: break
                 self.camino.append((i, fila_fin, n))
                 n += 1
-            # El límite inferior sube una fila
             fila_fin -= 1
-
-            # 4. MOVIENDO HACIA ARRIBA (Columna izquierda)
-            # Recorre hacia arriba las filas de la columna izquierda actual
             for i in range(fila_fin, fila_inicio - 1, -1):
                 if n > total_casillas: break
                 self.camino.append((col_inicio, i, n))
                 n += 1
-            # El límite izquierdo se mueve una columna a la derecha
             col_inicio += 1
-            # Al terminar este paso, el cuadro es más pequeño y el ciclo se repite hacia adentro
 
-    def on_draw(self):
-        """Esta función se encarga de renderizar todo en pantalla."""
-        self.clear() # Limpia la pantalla en cada fotograma
+    def obtener_coordenadas_casilla(self, numero_casilla):
+        """Busca los píxeles x, y de una casilla específica."""
+        if numero_casilla == 0:
+            return 50, 750 # Posición de salida fuera del tablero
         
-        # Puntos de referencia para que el tablero no esté pegado a los bordes
         offset_x = 125
         offset_y = SCREEN_HEIGHT - 175
 
-        # Recorremos la lista de posiciones que generamos en 'generar_espiral'
+        # Buscamos en la lista 'camino' la casilla correspondiente
         for col, fila, num in self.camino:
-            # Convertimos los índices (0,1,2...) en píxeles reales multiplicando por el tamaño
+            if num == numero_casilla:
+                x = offset_x + col * (CELL_SIZE + MARGIN) + CELL_SIZE / 2
+                y = offset_y - fila * (CELL_SIZE + MARGIN) + CELL_SIZE / 2
+                return x, y
+        return 0, 0
+
+    def on_key_press(self, key, modifiers):
+        """Se ejecuta cada vez que presionamos una tecla."""
+        if key == arcade.key.SPACE:
+            # Movemos al jugador actual una casilla
+            jugador = self.jugadores[self.turno_actual]
+            
+            if jugador.casilla_actual < 36:
+                jugador.casilla_actual += 1
+            
+            # Cambiamos el turno al siguiente jugador (0, 1, 2, 3 y vuelve a 0)
+            self.turno_actual = (self.turno_actual + 1) % 4
+
+    def on_draw(self):
+        self.clear()
+        
+        offset_x = 125
+        offset_y = SCREEN_HEIGHT - 175
+
+        # DIBUJAR TABLERO
+        for col, fila, num in self.camino:
             x = offset_x + col * (CELL_SIZE + MARGIN)
             y = offset_y - fila * (CELL_SIZE + MARGIN)
 
-            # Lógica de colores según el número de casilla
             color_fondo = arcade.color.GREEN
-            if num % 5 == 0: 
-                color_fondo = arcade.color.GOLD # Casillas especiales "de oca a oca"
-            if num == 36: 
-                color_fondo = arcade.color.INDIAN_RED # Casilla de meta
+            if num % 5 == 0: color_fondo = arcade.color.GOLD
+            if num == 36: color_fondo = arcade.color.INDIAN_RED
 
-            # Creamos el rectángulo con las coordenadas calculadas
             rect = arcade.LBWH(x, y, CELL_SIZE, CELL_SIZE)
-            
-            # Dibujamos el relleno y el borde negro
             arcade.draw_rect_filled(rect, color_fondo)
             arcade.draw_rect_outline(rect, arcade.color.BLACK, 2)
+            arcade.draw_text(str(num), x + CELL_SIZE/2, y + CELL_SIZE/2,
+                             arcade.color.BLACK, 18, anchor_x="center", anchor_y="center")
 
-            # Dibujamos el número en el centro de la casilla
-            arcade.draw_text(
-                str(num),
-                x + CELL_SIZE/2, y + CELL_SIZE/2,
-                arcade.color.BLACK, 18,
-                anchor_x="center", anchor_y="center", bold=True
-            )
+        # DIBUJAR FICHAS
+        for i, jugador in enumerate(self.jugadores):
+            posX, posY = self.obtener_coordenadas_casilla(jugador.casilla_actual)
+            
+            # Añadimos un pequeño desplazamiento (offset) para que las fichas 
+            # no se tapen totalmente si están en la misma casilla
+            desplazamiento = (i - 1.5) * 10 
+            
+            arcade.draw_circle_filled(posX + desplazamiento, posY + desplazamiento, 
+                                      jugador.radio, jugador.color)
+            arcade.draw_circle_outline(posX + desplazamiento, posY + desplazamiento, 
+                                       jugador.radio, arcade.color.BLACK, 2)
+
+        # Mostrar de quién es el turno
+        arcade.draw_text(f"Turno del Jugador: {self.turno_actual + 1}", 
+                         400, 750, arcade.color.BLACK, 20, anchor_x="center")
 
 def main():
-    # Crea una instancia de la clase OcaGame y arranca el motor del juego
-    OcaGame()
+    game = OcaGame()
     arcade.run()
 
 if __name__ == "__main__":
