@@ -1,12 +1,29 @@
-Instrucciones para owners:
--Agregar a todos como colaboradores (todos write), en teoría el Ruleset les impedirá subir nada a main directamente
-- Proteger el main "Branch protection rules", haz clic en Add branch protection rule.Configuración del Ruleset con Require a pull request before merging y Require review from Code Owners
-- crear archivo .github/CODEOWNERS
+Configuración Inicial
 
-Instrucciones para el resto:
-- Solo primera vez, en terminal vscode: git clone https://github.com/Badel-git/E1B_Proyecto2025.git Luego debe abrir la carpeta del proyecto en VS Code: Archivo > Abrir carpeta
-- crear una rama en VS Code: git checkout -b pepitoperez. A partir de ahí, abres el archivo modificas y guardas sin mas. 
-- Después de tus cambios haces ad + commit para que se entere desde consola: git add . -> git commit -m "mi parte" -> git push origin pepitoperez
-- Crean el Pull Request en GitHub (web): botón verde de "Compare & pull request". comenten o expliquen que cambiaron
-- Tú (o un revisor) va a Files changed -> Review changes -> Approve. Para que luego los revisores verán que el botón de "Merge"
-- Al darle a merge... debiera unir el código al proyecto principal.
+git config: Establece tu identidad (nombre y correo) para que Git sepa quién firma los cambios.
+
+git config --global user.email "tucorreoelectronico"
+
+git config --global user.name "tunombredegithub"
+
+Gestión del Repositorio
+
+git init: Crea un nuevo repositorio de Git en la carpeta donde estás parado.
+
+git status: Te muestra el "estado" actual: qué archivos has modificado, cuáles vas a guardar y en qué rama estás.
+
+git branch: Lista todas las ramas de tu proyecto.
+
+Guardado de Cambios
+
+git add .: Prepara todos los archivos modificados para ser guardados (los añade al "escenario" o staging area).
+
+git commit -m "...": Guarda definitivamente los cambios preparados con un mensaje descriptivo.
+
+Ramas y Remoto
+
+git checkout -b "nombre": Crea una rama nueva y te cambia a ella automáticamente.
+
+git push -u origin "nombre": Sube tus cambios locales al servidor (GitHub) y vincula tu rama local con la remota.
+
+git pull origin "nombre": Descarga y fusiona los cambios más recientes del servidor a tu computadora (para estar al día con lo que subieron otros).
