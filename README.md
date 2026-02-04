@@ -1,6 +1,8 @@
 Configuración Inicial
 - git config: Establece tu identidad (nombre y correo) para que Git sepa quién firma los cambios.
+
 - git config --global user.email "tucorreoelectronico"
+
 - git config --global user.name "tunombredegithub"
 
 Gestión del Repositorio
