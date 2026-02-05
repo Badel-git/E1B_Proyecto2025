@@ -1,3 +1,8 @@
+# Instrucciones para owners:
+Agregar a todos como colaboradores (todos write), en teoría el Ruleset les impedirá subir nada a main directamente
+Proteger el main "Branch protection rules", haz clic en Add branch protection rule.Configuración del Ruleset con Require a pull request before merging y Require review from Code Owners
+crear archivo .github/CODEOWNERS
+
 # Guía de Trabajo en GitHub para el Proyecto E1B
 Sigue estos pasos en orden para evitar borrar el trabajo de los demás.
 
@@ -6,7 +11,7 @@ Si acabas de instalar Git, esto es obligatorio para que sepa quién eres.
 
 Abre la terminal en VS Code (Ctrl + ñ) y escribe esto (cambiando los datos por los tuyos):
 
-Bash
+> Terminal
 `git config --global user.email "tucorreo@ejemplo.com"`
 `git config --global user.name "TuNombreUsuario"`
 *(Nota: Usa el mismo email de tu cuenta de GitHub para que te cuente las contribuciones).* 
