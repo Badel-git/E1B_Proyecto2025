@@ -12,14 +12,16 @@ Si acabas de instalar Git, esto es obligatorio para que sepa quién eres.
 Abre la terminal en VS Code (Ctrl + ñ) y escribe esto (cambiando los datos por los tuyos):
 
 > Terminal
-`git config --global user.email "tucorreo@ejemplo.com"`
+`git config --global user.email "tucorreo@ejemplo.com"`\\
 `git config --global user.name "TuNombreUsuario"`
+
 *(Nota: Usa el mismo email de tu cuenta de GitHub para que te cuente las contribuciones).* 
 
 2. Descargar el proyecto (Solo la primera vez)
 
 > Terminal
 `git clone https://github.com/Badel-git/E1B_Proyecto2025.git`
+
 **IMPORTANTE**: Ahora ve a Archivo > Abrir carpeta y selecciona la carpeta E1B_Proyecto2025 que se acaba de crear.
 
 3. Flujo de Trabajo Diario (Cada vez que trabajes)
@@ -29,12 +31,14 @@ Abre la terminal en VS Code (Ctrl + ñ) y escribe esto (cambiando los datos por 
 > Terminal
 `git checkout "main"`
 `git pull origin "main"`
+
 *(Nota: Si la rama principal se llama "master", cambia main por master).* 
 
 - B. Crear tu rama de trabajo: Nunca trabajes directamente en main. Crea una rama con tu nombre o la tarea:
 
 > Terminal
 `git checkout -b "nombre-tarea"`
+
 # Ejemplo: git checkout -b pepito-login
 
 - C. Trabajar y Guardar:
