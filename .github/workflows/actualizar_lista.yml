@@ -1,1 +1,53 @@
+name: Update Task List
+on:
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled]
+  workflow_dispatch:
 
+jobs:
+  update-status-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.BOT_TOKEN }}
+
+      - name: Generar Lista de Tareas Pendientes
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open' // <--- AQUÍ está el truco: solo trae las abiertas
+            });
+
+            let content = "# 📋 Tareas Pendientes por Grupo\n";
+            content += "_Las tareas se eliminan de esta lista automáticamente al cerrarse._\n\n";
+            
+            const groups = ['Grupo 1', 'Grupo 2', 'Grupo 3', 'Grupo 4', 'Grupo 5'];
+            
+            groups.forEach(group => {
+              content += `## 👥 ${group}\n`;
+              const groupIssues = issues.data.filter(i => i.labels.some(l => l.name === group));
+              
+              if (groupIssues.length === 0) {
+                content += "- _No hay tareas pendientes en este grupo._\n";
+              } else {
+                groupIssues.forEach(issue => {
+                  // Ya no necesitamos el check [x] porque solo habrá abiertas [ ]
+                  content += `- [ ] ${issue.title} (#${issue.number})\n`;
+                });
+              }
+              content += "\n";
+            });
+
+            require('fs').writeFileSync('Tareas.md', content);
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          git add Tareas.md
+          git commit -m "Actualizar lista: tarea completada/eliminada" || exit 0
+          git push origin main
