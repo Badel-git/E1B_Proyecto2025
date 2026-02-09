@@ -1,7 +1,13 @@
-# Instrucciones para owners:
-Agregar a todos como colaboradores (todos write), en teoría el Ruleset les impedirá subir nada a main directamente
-Proteger el main "Branch protection rules", haz clic en Add branch protection rule.Configuración del Ruleset con Require a pull request before merging y Require review from Code Owners
-crear archivo .github/CODEOWNERS
+# PRIORIDAD, modificado por Badel.
+**Documentación del proyecto**
+[Presentación](https://docs.google.com/presentation/d/1HoPTf3qFUyXaOB4XI_P66ttOBEf0U9TzJmu1wIcJYys/edit?slide=id.g3b53158b3fe_0_67#slide=id.g3b53158b3fe_0_67), dentro de ella links a grupos, seguimiento de tareas, documentación extra etc...
+Es resposabilidad individual y/o de los grupos responsables de cada área del proyecto mantener la documentación actualizada para el resto. 
+
+**Instrucciones**
+**Instrucciones para owners:**
+-Agregar a todos como colaboradores (todos write), en teoría el Ruleset les impedirá subir nada a main directamente
+- Proteger el main "Branch protection rules", haz clic en Add branch protection rule.Configuración del Ruleset con Require a pull request before merging y Require review from Code Owners
+- crear archivo .github/CODEOWNERS
 
 # Guía de Trabajo en GitHub para el Proyecto E1B
 Sigue estos pasos en orden para evitar borrar el trabajo de los demás.
