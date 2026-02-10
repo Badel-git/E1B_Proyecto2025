@@ -1,0 +1,40 @@
+name: Auto Sync Branches
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.BOT_TOKEN }}
+          fetch-depth: 0
+
+      - name: Sync all branches with main
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Bot de Sincronización"
+          
+          git fetch --all --prune
+          
+          for remote_branch in $(git branch -r | grep 'origin/' | grep -v 'origin/main' | grep -v 'HEAD'); do
+            branch=${remote_branch#origin/}
+            echo "--------------------------------------------"
+            echo "🔄 Procesando rama: $branch"
+            
+            git checkout -B $branch $remote_branch
+            
+            if git merge origin/main --no-edit; then
+              echo "✅ Sincronización exitosa para $branch"
+              git push origin $branch
+            else
+              echo "❌ Conflicto detectado en $branch. Saltando rama..."
+              git merge --abort
+            fi
+          done
