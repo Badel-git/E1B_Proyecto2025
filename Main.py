@@ -1,6 +1,8 @@
 import arcade
 import os
 import urllib.request
+import random
+
 
 # --- 1. CONFIGURACIÓN ---
 file_path = os.path.dirname(os.path.abspath(__file__))
@@ -24,6 +26,14 @@ PLAYER_COLORS = [
     arcade.color.YELLOW,
     arcade.color.PURPLE
 ]
+
+class Dado:
+    def tirar(self):
+        return random.randint(1,6)
+    
+
+dado = Dado()
+pasos = dado.tirar()
 
 class Ficha:
     def __init__(self, ID, color):
@@ -142,8 +152,11 @@ class OcaGame(arcade.Window):
         # --- ESPACIO: MOVER ---    
         elif key == arcade.key.SPACE:
             jugador = self.jugadores[self.turno_actual]
+
+            pasos = dado.tirar()
+
             if jugador.casilla_actual < 36:
-                jugador.casilla_actual += 1
+                jugador.casilla_actual += pasos
             self.turno_actual = (self.turno_actual + 1) % 4
 
     def on_draw(self):
