@@ -26,7 +26,7 @@ jobs:
             let content = "# 📋 Tareas Pendientes por Grupo\n";
             content += "_Las tareas se eliminan de esta lista automáticamente al cerrarse._\n\n";
             
-            const groups = ['Grupo 2', 'Grupo 4'];
+            const groups = ['Grupo 1', 'Grupo 2', 'Grupo 3', 'Grupo 4' , 'Grupo 5'];
             
             groups.forEach(group => {
               content += `## 👥 ${group}\n`;
