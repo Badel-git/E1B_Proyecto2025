@@ -70,4 +70,3 @@ Dale a "Create Pull Request".
 Revisión: Pide a un compañero que revise, y si todo está bien, le dé a Review changes -> Approve.
 
 Merge: Una vez aprobado, aparecerá el botón "Merge pull request". Púlsalo y luego "Confirm merge".
->>>>>>> 3a028c10cbd7785efb1e1f18bc9191934e5c8c9c
