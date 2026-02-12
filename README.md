@@ -70,6 +70,9 @@ Dale a "Create Pull Request".
 Revisión: Pide a un compañero que revise, y si todo está bien, le dé a Review changes -> Approve.
 
 Merge: Una vez aprobado, aparecerá el botón "Merge pull request". Púlsalo y luego "Confirm merge".
+
 5. Usar el Bot para sincronizar tu rama local 
+
+> Terminal 
 `git fetch origin PythonJairo`  
 `git reset --hard origin/PythonJairo`  
