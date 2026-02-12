@@ -75,6 +75,6 @@ Merge: Una vez aprobado, aparecerá el botón "Merge pull request". Púlsalo y l
 5. Usar el Bot para sincronizar tu rama local 
 
 > Terminal 
-
-`git fetch origin turama`  
-`git reset --hard origin/turama`  
+SOLO UNA VEZ 
+`git config --global alias.sync '!f() { br=$(git rev-parse --abbrev-ref HEAD); git fetch origin $br; git reset --hard origin/$br; }; f'`  
+`git sync`  
