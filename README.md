@@ -74,5 +74,6 @@ Merge: Una vez aprobado, aparecerá el botón "Merge pull request". Púlsalo y l
 5. Usar el Bot para sincronizar tu rama local 
 
 > Terminal 
-`git fetch origin PythonJairo`  
-`git reset --hard origin/PythonJairo`  
+
+`git fetch origin turama`  
+`git reset --hard origin/turama`  
