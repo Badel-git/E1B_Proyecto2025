@@ -2,7 +2,7 @@
 _Las tareas se eliminan de esta lista automáticamente al cerrarse._
 
 ## 👥 Grupo 1
-- [ ] Prueba (#27)
+- _No hay tareas pendientes en este grupo._
 
 ## 👥 Grupo 2
 - _No hay tareas pendientes en este grupo._
