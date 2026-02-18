@@ -3,7 +3,6 @@ import os
 import urllib.request
 import random
 
-
 # --- 1. CONFIGURACIÓN ---
 file_path = os.path.dirname(os.path.abspath(__file__))
 os.chdir(file_path)
@@ -20,48 +19,53 @@ URL_CASILLA_1 = "https://i.postimg.cc/Sxh5FjWh/bandera.png"
 CELL_SIZE = 120
 MARGIN = 5
 
-PLAYER_COLORS = [
-    arcade.color.RED,
-    arcade.color.BLUE,
-    arcade.color.YELLOW,
-    arcade.color.PURPLE
+# --- RUTAS DE LAS IMÁGENES DE LAS FICHAS ---
+# Asegúrate de que estas rutas sean correctas en tu PC
+PLAYER_IMAGES = [
+    os.path.join("assets", "img", "ficha", "Ficha_Arte-sinfondo.png"),      # Roja
+    os.path.join("assets", "img", "ficha", "FICHA_CIENCIA-sinfondo.png"),   # Azul
+    os.path.join("assets", "img", "ficha", "Ficha_Historia-sinfondo.png"),  # Amarilla
+    os.path.join("assets", "img", "ficha", "Ficha_Geografia-sinfondo.png")  # Verde
 ]
 
 class Dado:
     def tirar(self):
         return random.randint(1,6)
     
-
 dado = Dado()
 pasos = dado.tirar()
 
 class Ficha:
-    def __init__(self, ID, color):
+    def __init__(self, ID, image_path):
         self.ID = ID
-        self.color = color
         self.casilla_actual = 0
         self.radio = 25
+        
+        # --- CARGA DE LA TEXTURA ---
+        self.texture = None
+        try:
+            self.texture = arcade.load_texture(image_path)
+        except Exception as e:
+            print(f"Error al cargar la imagen de la ficha {ID}: {e}")
 
 class OcaGame(arcade.Window):
     def __init__(self):
-        # Arrancamos en pantalla completa
         super().__init__(title=SCREEN_TITLE, fullscreen=True)
         
-        # Variables para texturas
         self.background = None
         self.usar_imagen_fondo = False
         self.textura_casilla_1 = None 
 
-        # --- MENSAJE DE CARGA ---
         print("Cargando recursos... ⚙️")
 
-        # --- CARGA NINJA ---
         self.cargar_textura_ninja(URL_FONDO, "temp_fondo.jpg", es_fondo=True)
         self.cargar_textura_ninja(URL_CASILLA_1, "temp_c1.png", es_fondo=False)
 
         self.camino = []
         self.generar_espiral()
-        self.jugadores = [Ficha(i, PLAYER_COLORS[i]) for i in range(4)]
+        
+        # --- CARGAMOS JUGADORES CON IMÁGENES ---
+        self.jugadores = [Ficha(i, PLAYER_IMAGES[i]) for i in range(4)]
         self.turno_actual = 0
 
     def cargar_textura_ninja(self, url, nombre_temp, es_fondo):
@@ -82,7 +86,6 @@ class OcaGame(arcade.Window):
                 os.remove(nombre_temp)
                 
         except Exception:
-            # Si falla, silencio (o fondo gris)
             if es_fondo: self.background_color = arcade.color.GRAY
 
     def generar_espiral(self):
@@ -114,7 +117,6 @@ class OcaGame(arcade.Window):
             col_inicio += 1
 
     def obtener_offsets(self):
-        # Se adapta al tamaño actual de la ventana
         tablero_ancho = 6 * (CELL_SIZE + MARGIN)
         tablero_alto = 6 * (CELL_SIZE + MARGIN)
         
@@ -138,23 +140,16 @@ class OcaGame(arcade.Window):
         return 0, 0
 
     def on_key_press(self, key, modifiers):
-        # --- ESC: SALIR ---
         if key == arcade.key.ESCAPE:
             self.close()
-            
-        # --- F11: PANTALLA COMPLETA / VENTANA ---
         elif key == arcade.key.F11:
             self.set_fullscreen(not self.fullscreen)
             if not self.fullscreen:
                 self.set_size(1280, 720)
                 self.center_window()
-
-        # --- ESPACIO: MOVER ---    
         elif key == arcade.key.SPACE:
             jugador = self.jugadores[self.turno_actual]
-
             pasos = dado.tirar()
-
             if jugador.casilla_actual < 36:
                 jugador.casilla_actual += pasos
             self.turno_actual = (self.turno_actual + 1) % 4
@@ -176,7 +171,6 @@ class OcaGame(arcade.Window):
             
             rect_casilla = arcade.LBWH(x, y, CELL_SIZE, CELL_SIZE)
 
-            # Casilla 1 Bandera
             if num == 1 and self.textura_casilla_1:
                 arcade.draw_texture_rect(self.textura_casilla_1, rect_casilla)
             else:
@@ -187,22 +181,31 @@ class OcaGame(arcade.Window):
 
             arcade.draw_rect_outline(rect_casilla, arcade.color.BLACK, 2)
             
-            # Número
             arcade.draw_text(
                 str(num), x + CELL_SIZE/2, y + CELL_SIZE/2,
                 arcade.color.BLACK, 24, anchor_x="center", anchor_y="center", bold=True
             )
 
-        # 3. FICHAS
+        # 3. FICHAS (IMÁGENES)
         for i, jugador in enumerate(self.jugadores):
             posX, posY = self.obtener_coordenadas_casilla(jugador.casilla_actual)
-            desplazamiento_x = (i % 2 - 0.5) * 20
-            desplazamiento_y = (i // 2 - 0.5) * 20
-            arcade.draw_circle_filled(posX + desplazamiento_x, posY + desplazamiento_y, jugador.radio, jugador.color)
-            arcade.draw_circle_outline(posX + desplazamiento_x, posY + desplazamiento_y, jugador.radio, arcade.color.BLACK, 2)
+            
+            # Desplazamiento para que las fichas no se solapen
+            desplazamiento_x = (i % 2 - 0.5) * 40
+            desplazamiento_y = (i // 2 - 0.5) * 40
+
+            if jugador.texture:
+                # SOLUCIÓN: Usamos draw_texture_rect con un rectángulo XYWH (Centro X, Centro Y, Ancho, Alto)
+                # Esta es la forma moderna que ya usas para el fondo.
+                rect_ficha = arcade.XYWH(posX + desplazamiento_x, posY + desplazamiento_y, 60, 60)
+                arcade.draw_texture_rect(jugador.texture, rect_ficha)
+            else:
+                # Círculo de seguridad
+                colores_backup = [arcade.color.RED, arcade.color.BLUE, arcade.color.YELLOW, arcade.color.GREEN]
+                arcade.draw_circle_filled(posX + desplazamiento_x, posY + desplazamiento_y, 20, colores_backup[i])
 
         # 4. TEXTO
-        nombres = ["ROJO", "AZUL", "AMARILLO", "MORADO"]
+        nombres = ["Arte", "Ciencia", "Historia", "Geografía"]
         texto = f"Turno: {nombres[self.turno_actual]} - Pulsa ESPACIO - (F11: Pantalla / ESC: Salir)"
         
         rect_texto = arcade.LBWH((self.width // 2) - 400, 35, 800, 50)
