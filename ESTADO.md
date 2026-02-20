@@ -2,17 +2,17 @@
 _Las tareas se eliminan de esta lista automáticamente al cerrarse._
 
 ## 👥 Grupo 1
-- _No hay tareas pendientes en este grupo._
+- [ ] Tener una cuenta de Github (#29)
 
 ## 👥 Grupo 2
-- _No hay tareas pendientes en este grupo._
+- [ ] Tener una cuenta de Github (#29)
 
 ## 👥 Grupo 3
-- _No hay tareas pendientes en este grupo._
+- [ ] Tener una cuenta de Github (#29)
 
 ## 👥 Grupo 4
-- _No hay tareas pendientes en este grupo._
+- [ ] Tener una cuenta de Github (#29)
 
 ## 👥 Grupo 5
-- _No hay tareas pendientes en este grupo._
+- [ ] Tener una cuenta de Github (#29)
 
