@@ -122,16 +122,17 @@ class OcaGame(arcade.Window):
         return 0, 0
 
     ## --- BLOQUE NUEVO ---
-    def on_mouse_press(self, x, y, button, modifiers):  ## CAMBIO: Función nueva para clics
-        if self.estado == ESTADO_MENU:                  ## CAMBIO: Solo funciona en el menú
+    def on_mouse_press(self, x, y, button, modifiers):
+        if self.estado == ESTADO_MENU:
             for i in range(4):
                 cx = self.width // 2 - 300 + (i * 200)
                 cy = self.height // 2
                 # Pitágoras para detectar clic manual
                 distancia = math.sqrt((x - cx)**2 + (y - cy)**2) 
-                if distancia < 80:                      ## CAMBIO: Si pulsas una ficha...
-                    self.jugador_elegido = i            ## CAMBIO: Guardar selección
-                    self.estado = ESTADO_JUEGO          ## CAMBIO: Cambiar al tablero
+                if distancia < 80:
+                    self.jugador_elegido = i
+                    self.turno_actual = i               ## CAMBIO: Forzamos que el turno inicial sea el de tu ficha
+                    self.estado = ESTADO_JUEGO
                     print(f"Elegido: {i}")
 
     def on_key_press(self, key, modifiers):
@@ -141,13 +142,13 @@ class OcaGame(arcade.Window):
             self.set_fullscreen(not self.fullscreen)
             self.set_mouse_visible(True)
             
-        # CAMBIO: Se añade la condición de que el estado sea JUEGO para tirar el dado
+        # CAMBIO: Solo movemos la ficha seleccionada y eliminamos el cambio de turno
         if self.estado == ESTADO_JUEGO and key == arcade.key.SPACE:
-            jugador = self.jugadores[self.turno_actual]
+            jugador = self.jugadores[self.jugador_elegido] ## CAMBIO: Solo se mueve tu ficha
             pasos = dado.tirar()
             if jugador.casilla_actual < 36:
                 jugador.casilla_actual += pasos
-            self.turno_actual = (self.turno_actual + 1) % 4
+            # ELIMINADO: La línea que sumaba +1 al turno actual
 
     def on_draw(self):
         self.clear()
@@ -188,14 +189,18 @@ class OcaGame(arcade.Window):
             arcade.draw_text(str(num), x + CELL_SIZE/2, y + CELL_SIZE/2, arcade.color.BLACK, 24, anchor_x="center", bold=True)
 
         for i, jugador in enumerate(self.jugadores):
-            posX, posY = self.obtener_coordenadas_casilla(jugador.casilla_actual)
-            dx, dy = (i % 2 - 0.5) * 40, (i // 2 - 0.5) * 40
-            if jugador.texture:
-                arcade.draw_texture_rect(jugador.texture, arcade.XYWH(posX + dx, posY + dy, 60, 60))
-            
-            # --- CAMBIO: Bloque nuevo para indicar quién es el jugador ---
-            if i == self.jugador_elegido:
+            if i == self.jugador_elegido: ## CAMBIO: Condición para dibujar solo a tu jugador
+                posX, posY = self.obtener_coordenadas_casilla(jugador.casilla_actual)
+                dx, dy = 0, 0 ## CAMBIO: Centramos la ficha anulando el desfase
+                if jugador.texture:
+                    arcade.draw_texture_rect(jugador.texture, arcade.XYWH(posX + dx, posY + dy, 60, 60))
+                
+                # --- CAMBIO: Bloque nuevo para indicar quién es el jugador ---
                 arcade.draw_text("TÚ", posX + dx, posY + dy + 45, arcade.color.WHITE, 14, anchor_x="center", bold=True)
+
+        nombres = ["Arte", "Ciencia", "Historia", "Geografía"]
+        texto = f"Turno: {nombres[self.jugador_elegido]} - Pulsa ESPACIO" ## CAMBIO: Mostrar solo tu nombre
+        arcade.draw_text(texto, self.width // 2, 60, arcade.color.WHITE, 24, anchor_x="center", bold=True)
 
         nombres = ["Arte", "Ciencia", "Historia", "Geografía"]
         texto = f"Turno: {nombres[self.turno_actual]} - Pulsa ESPACIO"
