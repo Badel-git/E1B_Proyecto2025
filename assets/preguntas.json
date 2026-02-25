@@ -1,0 +1,184 @@
+{
+  "preguntas": [
+    {
+      "categoria": "Historia",
+      "pregunta": "¿Quién descubrió América?",
+      "opciones": ["Marco Polo", "Cristóbal Colón", "Hernán Cortés", "Napoleón"],
+      "correcta": "B"
+    },
+    {
+      "categoria": "Historia",
+      "pregunta": "¿Quién fue el primer presidente de Estados Unidos?",
+      "opciones": ["Thomas Jefferson", "Abraham Lincoln", "George Washington", "John Adams"],
+      "correcta": "C"
+    },
+    {
+      "categoria": "Historia",
+      "pregunta": "¿Qué civilización construyó las pirámides de Egipto?",
+      "opciones": ["Egipcia", "Maya", "Romana", "Inca"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Historia",
+      "pregunta": "¿Quién escribió \"Don Quijote de la Mancha\"?",
+      "opciones": ["Federico García Lorca", "Lope de Vega", "Miguel de Cervantes", "Pablo Neruda"],
+      "correcta": "C"
+    },
+    {
+      "categoria": "Historia",
+      "pregunta": "¿Quién pintó \"La Última Cena\"?",
+      "opciones": ["Leonardo da Vinci", "Pablo Picasso", "Miguel Ángel", "Salvador Dalí"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Geografía",
+      "pregunta": "¿Cuál es la capital de España?",
+      "opciones": ["Madrid", "Barcelona", "Sevilla", "Valencia"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Geografía",
+      "pregunta": "¿Cuál es la capital de Francia?",
+      "opciones": ["Lyon", "París", "Marsella", "Niza"],
+      "correcta": "B"
+    },
+    {
+      "categoria": "Geografía",
+      "pregunta": "¿Cuál es el océano más grande?",
+      "opciones": ["Índico", "Atlántico", "Pacífico", "Ártico"],
+      "correcta": "C"
+    },
+    {
+      "categoria": "Geografía",
+      "pregunta": "¿En qué continente está Egipto?",
+      "opciones": ["África", "Asia", "Europa", "América"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Geografía",
+      "pregunta": "¿Qué país es famoso por la Torre Eiffel?",
+      "opciones": ["Francia", "España", "Italia", "Alemania"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Geografía",
+      "pregunta": "¿Cuál es la capital de Japón?",
+      "opciones": ["Osaka", "Kioto", "Tokio", "Hiroshima"],
+      "correcta": "C"
+    },
+    {
+      "categoria": "Geografía",
+      "pregunta": "¿Cuál es la capital de Italia?",
+      "opciones": ["Venecia", "Milán", "Roma", "Florencia"],
+      "correcta": "C"
+    },
+    {
+      "categoria": "Geografía",
+      "pregunta": "¿Qué país es conocido por los canguros?",
+      "opciones": ["Nueva Zelanda", "Australia", "Canadá", "Sudáfrica"],
+      "correcta": "B"
+    },
+    {
+      "categoria": "Geografía",
+      "pregunta": "¿Qué isla es la más grande del mundo?",
+      "opciones": ["Groenlandia", "Madagascar", "Borneo", "Sumatra"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Geografía",
+      "pregunta": "¿Cuál es el río más largo del mundo?",
+      "opciones": ["Amazonas", "Nilo", "Misisipi", "Yangtsé"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Ciencia",
+      "pregunta": "¿Qué planeta está más cerca del Sol?",
+      "opciones": ["Mercurio", "Venus", "Marte", "Júpiter"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Ciencia",
+      "pregunta": "¿Cuál es el planeta rojo?",
+      "opciones": ["Saturno", "Venus", "Marte", "Júpiter"],
+      "correcta": "C"
+    },
+    {
+      "categoria": "Ciencia",
+      "pregunta": "¿Qué gas respiramos los humanos?",
+      "opciones": ["Helio", "Dióxido de carbono", "Oxígeno", "Nitrógeno"],
+      "correcta": "C"
+    },
+    {
+      "categoria": "Ciencia",
+      "pregunta": "¿Cuál es el órgano más grande del cuerpo?",
+      "opciones": ["Piel", "Corazón", "Pulmón", "Hígado"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Ciencia",
+      "pregunta": "¿Cuál es el líquido que bebemos para hidratarnos?",
+      "opciones": ["Agua", "Leche", "Jugo", "Vino"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Arte y Cultura",
+      "pregunta": "¿Quién pintó la Mona Lisa?",
+      "opciones": ["Van Gogh", "Picasso", "Dalí", "Leonardo da Vinci"],
+      "correcta": "D"
+    },
+    {
+      "categoria": "Arte y Cultura",
+      "pregunta": "¿Quién escribió \"Romeo y Julieta\"?",
+      "opciones": ["William Shakespeare", "Cervantes", "Lorca", "Dickens"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Arte y Cultura",
+      "pregunta": "¿Qué instrumento tiene cuerdas y se toca con arco?",
+      "opciones": ["Violín", "Piano", "Guitarra", "Batería"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Arte y Cultura",
+      "pregunta": "¿En qué país se originó el flamenco?",
+      "opciones": ["Italia", "México", "Argentina", "España"],
+      "correcta": "D"
+    },
+    {
+      "categoria": "Arte y Cultura",
+      "pregunta": "¿Quién es famoso por la obra \"Guernica\"?",
+      "opciones": ["Pablo Picasso", "Dalí", "Goya", "Velázquez"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Curiosidades / Cultura general",
+      "pregunta": "¿Cuál es el satélite natural de la Tierra?",
+      "opciones": ["Sol", "Luna", "Marte", "Estrella"],
+      "correcta": "B"
+    },
+    {
+      "categoria": "Curiosidades / Cultura general",
+      "pregunta": "¿Qué fruta es amarilla y alargada?",
+      "opciones": ["Plátano", "Manzana", "Naranja", "Uva"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Curiosidades / Cultura general",
+      "pregunta": "¿Qué animal dice \"miau\"?",
+      "opciones": ["Gato", "Perro", "Vaca", "Caballo"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Curiosidades / Cultura general",
+      "pregunta": "¿Qué animal dice \"guau\"?",
+      "opciones": ["Perro", "Gato", "Oveja", "Pato"],
+      "correcta": "A"
+    },
+    {
+      "categoria": "Curiosidades / Cultura general",
+      "pregunta": "¿Qué invento permite hablar a distancia?",
+      "opciones": ["Teléfono", "Computadora", "Radio", "Televisión"],
+      "correcta": "A"
+    }
+  ]
+}

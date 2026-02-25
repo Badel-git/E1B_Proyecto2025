@@ -3,6 +3,7 @@ import os
 import urllib.request
 import random
 import math  ## CAMBIO: Nueva librería para calcular distancias de clics
+import json
 
 # --- 1. CONFIGURACIÓN ---
 file_path = os.path.dirname(os.path.abspath(__file__))
@@ -65,6 +66,16 @@ class OcaGame(arcade.Window):
         self.jugadores = [Ficha(i, PLAYER_IMAGES[i]) for i in range(4)]
         self.turno_actual = 0
 
+    # --- REINTEGRACIÓN PREGUNTAS: Variables de control ---
+        # ========================================================
+        self.mostrando_pregunta = False  
+        self.pregunta_actual = None      
+        self.botones_rects = []          
+        self.resultado_quiz = None       
+        self.tiempo_feedback = 0         
+        self.lista_preguntas = []
+        self.cargar_preguntas_json()
+
     def cargar_textura_ninja(self, url, nombre_temp, es_fondo):
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -79,6 +90,19 @@ class OcaGame(arcade.Window):
             if os.path.exists(nombre_temp): os.remove(nombre_temp)
         except Exception:
             if es_fondo: self.background_color = arcade.color.GRAY
+
+
+        # --- REINTEGRACIÓN PREGUNTAS: Cargar JSON ---
+    def cargar_preguntas_json(self):
+        try:
+           ruta_json = os.path.join("assets", "preguntas.json")
+           with open(ruta_json, "r", encoding="utf-8") as archivo:
+                datos = json.load(archivo)
+                self.lista_preguntas = datos["preguntas"]
+                print(f"¡Éxito! Se han cargado {len(self.lista_preguntas)} preguntas.")
+        except Exception as e:
+            print(f"ERROR cargando JSON: {e}")
+            self.lista_preguntas = [{"pregunta": "Error: No se leyó preguntas.json", "opciones": ["A", "B", "C", "D"], "correcta": "A"}]
 
     def generar_espiral(self):
         total_casillas = 36
@@ -121,6 +145,26 @@ class OcaGame(arcade.Window):
                 return x, y
         return 0, 0
 
+
+    # --- REINTEGRACIÓN PREGUNTAS: Preparar la pregunta ---
+    def activar_pregunta(self):
+        self.mostrando_pregunta = True
+        self.resultado_quiz = None
+        
+        if self.lista_preguntas:
+            self.pregunta_actual = random.choice(self.lista_preguntas)
+        
+        self.botones_rects = []
+        cx = self.width // 2
+        cy = self.height // 2
+        ancho_btn, alto_btn = 500, 60
+        start_y = cy - 20
+        
+        for i in range(4):
+            y = start_y - (i * 80)
+            x = cx - (ancho_btn // 2)
+            self.botones_rects.append((x, y, ancho_btn, alto_btn))
+
     ## --- BLOQUE NUEVO ---
     def on_mouse_press(self, x, y, button, modifiers):
         if self.estado == ESTADO_MENU:
@@ -134,6 +178,33 @@ class OcaGame(arcade.Window):
                     self.turno_actual = i               ## CAMBIO: Forzamos que el turno inicial sea el de tu ficha
                     self.estado = ESTADO_JUEGO
                     print(f"Elegido: {i}")
+        
+        elif self.estado == ESTADO_JUEGO and self.mostrando_pregunta:
+            if self.resultado_quiz is None:
+                mapa_letras = {"A": 0, "B": 1, "C": 2, "D": 3}
+                idx_correcto = mapa_letras.get(self.pregunta_actual["correcta"], 0)
+
+                for i, rect in enumerate(self.botones_rects):
+                    bx, by, bw, bh = rect
+                    if bx < x < bx + bw and by < y < by + bh:
+                        if i == idx_correcto:
+                            self.resultado_quiz = "CORRECTO"
+                        else:
+                            self.resultado_quiz = "INCORRECTO"
+                        return 
+            else:
+                # Cierra la ventana si ya respondiste y haces clic
+                self.mostrando_pregunta = False
+                self.tiempo_feedback = 0 
+                self.resultado_quiz = None
+
+    def on_update(self, delta_time):
+        if self.resultado_quiz is not None:
+            self.tiempo_feedback += delta_time
+            if self.tiempo_feedback > 2.0:
+                self.mostrando_pregunta = False
+                self.tiempo_feedback = 0
+                self.resultado_quiz = None
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:
@@ -144,11 +215,21 @@ class OcaGame(arcade.Window):
             
         # CAMBIO: Solo movemos la ficha seleccionada y eliminamos el cambio de turno
         if self.estado == ESTADO_JUEGO and key == arcade.key.SPACE:
-            jugador = self.jugadores[self.jugador_elegido] ## CAMBIO: Solo se mueve tu ficha
-            pasos = dado.tirar()
-            if jugador.casilla_actual < 36:
-                jugador.casilla_actual += pasos
-            # ELIMINADO: La línea que sumaba +1 al turno actual
+            if not self.mostrando_pregunta:
+                jugador = self.jugadores[self.jugador_elegido] 
+                pasos = dado.tirar()
+                if jugador.casilla_actual < 36:
+                    jugador.casilla_actual += pasos
+                
+                # Lanzar pregunta si se mueve (y no es la meta ni el inicio)
+                if 0 < jugador.casilla_actual < 36:
+                    self.activar_pregunta()
+                    
+            # Si la pregunta está abierta y respondida, ESPACIO la cierra
+            elif self.mostrando_pregunta and self.resultado_quiz is not None:
+                self.mostrando_pregunta = False
+                self.tiempo_feedback = 0
+                self.resultado_quiz = None
 
     def on_draw(self):
         self.clear()
@@ -160,6 +241,9 @@ class OcaGame(arcade.Window):
             self.dibujar_menu()             ## CAMBIO: Llamada a la nueva pantalla
         else:
             self.dibujar_tablero_y_fichas() ## CAMBIO: Llamada a la lógica original
+        
+        if self.mostrando_pregunta and self.pregunta_actual:
+            self.dibujar_capa_pregunta()
 
     ## --- FUNCIÓN NUEVA ---
     def dibujar_menu(self):                 ## CAMBIO: Bloque nuevo para la visual del menú
@@ -205,6 +289,50 @@ class OcaGame(arcade.Window):
         nombres = ["Arte", "Ciencia", "Historia", "Geografía"]
         texto = f"Turno: {nombres[self.turno_actual]} - Pulsa ESPACIO"
         arcade.draw_text(texto, self.width // 2, 60, arcade.color.WHITE, 24, anchor_x="center", bold=True)
+    
+    def dibujar_capa_pregunta(self):
+        arcade.draw_lbwh_rectangle_filled(0, 0, self.width, self.height, (0, 0, 0, 230))
+        cx = self.width // 2
+        cy = self.height // 2
+
+        arcade.draw_text(
+            self.pregunta_actual["pregunta"], cx, cy + 150, arcade.color.WHITE,
+            30, anchor_x="center", anchor_y="center", width=900, align="center", multiline=True, bold=True
+        )
+
+        letras = ["A", "B", "C", "D"]
+        colores_base = [arcade.color.BLUE, arcade.color.RED, arcade.color.AMBER, arcade.color.GREEN]
+        mapa_letras = {"A": 0, "B": 1, "C": 2, "D": 3}
+        idx_correcto = mapa_letras.get(self.pregunta_actual["correcta"], 0)
+
+        for i, rect in enumerate(self.botones_rects):
+            x, y, w, h = rect
+            color_btn = colores_base[i]
+            
+            if self.resultado_quiz is not None:
+                if i == idx_correcto:
+                    color_btn = arcade.color.GOLD  
+                else:
+                    color_btn = arcade.color.GRAY  
+            
+            arcade.draw_lbwh_rectangle_filled(x, y, w, h, color_btn)
+            arcade.draw_lbwh_rectangle_outline(x, y, w, h, arcade.color.WHITE, 3)
+            
+            if color_btn in (arcade.color.GOLD, arcade.color.AMBER, arcade.color.GREEN, arcade.color.YELLOW):
+                color_texto = arcade.color.BLACK
+            else:
+                color_texto = arcade.color.WHITE
+
+            texto_op = f"{letras[i]}) {self.pregunta_actual['opciones'][i]}"
+            arcade.draw_text(texto_op, x + w / 2, y + h / 2, color_texto, 18, anchor_x="center", anchor_y="center")
+
+        if self.resultado_quiz:
+            texto_res = "¡CORRECTO!" if self.resultado_quiz == "CORRECTO" else "¡FALLASTE!"
+            color_res = arcade.color.GREEN if self.resultado_quiz == "CORRECTO" else arcade.color.RED
+            
+            arcade.draw_text(texto_res, cx + 2, cy - 252, arcade.color.BLACK, 40, anchor_x="center", bold=True)
+            arcade.draw_text(texto_res, cx - 2, cy - 248, arcade.color.BLACK, 40, anchor_x="center", bold=True)
+            arcade.draw_text(texto_res, cx, cy - 250, color_res, 40, anchor_x="center", bold=True)
 
 def main():
     OcaGame()
