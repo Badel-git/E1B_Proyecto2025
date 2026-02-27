@@ -363,9 +363,7 @@ class OcaGame(arcade.Window):
             texto_res = "¡CORRECTO!" if self.resultado_quiz == "CORRECTO" else "¡FALLASTE!"
             color_res = arcade.color.GREEN if self.resultado_quiz == "CORRECTO" else arcade.color.RED
             
-            arcade.draw_text(texto_res, cx + 2, cy - 252, arcade.color.BLACK, 40, anchor_x="center", bold=True)
-            arcade.draw_text(texto_res, cx - 2, cy - 248, arcade.color.BLACK, 40, anchor_x="center", bold=True)
-            arcade.draw_text(texto_res, cx, cy - 250, color_res, 40, anchor_x="center", bold=True)
+            arcade.draw_text(texto_res, cx, cy + 300, color_res, 40, anchor_x="center", bold=True)
 
 def main():
     OcaGame()
