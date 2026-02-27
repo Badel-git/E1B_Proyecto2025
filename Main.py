@@ -75,6 +75,10 @@ class OcaGame(arcade.Window):
         self.tiempo_feedback = 0         
         self.lista_preguntas = []
         self.cargar_preguntas_json()
+        # --- CONTROL DEL DADO VISUAL ---
+        self.dado_animacion_activa = False
+        self.dado_timer = 0.0
+        self.dado_valor_final = 1
 
     def cargar_textura_ninja(self, url, nombre_temp, es_fondo):
         try:
@@ -206,6 +210,11 @@ class OcaGame(arcade.Window):
                 self.tiempo_feedback = 0
                 self.resultado_quiz = None
 
+        if getattr(self, "dado_animacion_activa", False):
+            self.dado_timer -= delta_time
+        if self.dado_timer <= 0:
+                self.dado_animacion_activa = False
+
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:
             self.close()
@@ -218,6 +227,10 @@ class OcaGame(arcade.Window):
             if not self.mostrando_pregunta:
                 jugador = self.jugadores[self.jugador_elegido] 
                 pasos = dado.tirar()
+                self.dado_animacion_activa = True
+                self.dado_timer = 1.5
+                self.dado_valor_final = pasos
+                
                 if jugador.casilla_actual < 36:
                     jugador.casilla_actual += pasos
                 
@@ -244,7 +257,27 @@ class OcaGame(arcade.Window):
         
         if self.mostrando_pregunta and self.pregunta_actual:
             self.dibujar_capa_pregunta()
-
+        if getattr(self, "dado_animacion_activa", False):
+                    cx = self.width // 4
+                    cy = self.height // 2
+                    
+                    arcade.draw_rect_filled(arcade.XYWH(cx, cy, 250, 250), (0, 0, 0, 220))
+                    arcade.draw_rect_outline(arcade.XYWH(cx, cy, 250, 250), arcade.color.WHITE, 5)
+                    
+                    if self.dado_timer > 0.5:
+                        valor_mostrar = random.randint(1, 6)
+                        texto_dado = "TIRANDO..."
+                        color_texto = arcade.color.WHITE
+                    else:
+                        valor_mostrar = self.dado_valor_final
+                        texto_dado = "¡RESULTADO!"
+                        color_texto = arcade.color.GOLD
+                        
+                    arcade.draw_text(str(valor_mostrar), cx, cy - 20, color_texto, 
+                                    120, anchor_x="center", anchor_y="center", bold=True)
+                    
+                    arcade.draw_text(texto_dado, cx, cy - 160, arcade.color.WHITE, 
+                                    24, anchor_x="center", anchor_y="center", bold=True)
     ## --- FUNCIÓN NUEVA ---
     def dibujar_menu(self):                 ## CAMBIO: Bloque nuevo para la visual del menú
         arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), (0, 0, 0, 150))
