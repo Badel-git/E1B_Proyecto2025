@@ -2,7 +2,7 @@ import arcade
 import os
 import urllib.request
 import random
-import math  ## CAMBIO: Nueva librería para calcular distancias de clics
+import math  ## Librería para calcular distancias de clics
 import json
 
 # --- 1. CONFIGURACIÓN ---
@@ -24,9 +24,10 @@ PLAYER_IMAGES = [
     os.path.join("assets", "img", "ficha", "Ficha_Geografia-sinfondo.png")
 ]
 
-# --- NUEVOS ESTADOS DEL JUEGO --- ## CAMBIO: Definición de pantallas
-ESTADO_MENU = 0                     ## CAMBIO: Etiqueta para el menú
-ESTADO_JUEGO = 1                    ## CAMBIO: Etiqueta para el tablero
+# --- ESTADOS DEL JUEGO ---
+ESTADO_MENU = 0                    
+ESTADO_JUEGO = 1                   
+ESTADO_NOMBRE = 2   ## NUEVO: Pantalla para escribir el nombre
 
 class Dado:
     def tirar(self):
@@ -49,9 +50,10 @@ class OcaGame(arcade.Window):
     def __init__(self):
         super().__init__(title=SCREEN_TITLE, fullscreen=True)
         
-        self.set_mouse_visible(True)        ## CAMBIO: Forzar cursor visible
-        self.estado = ESTADO_MENU           ## CAMBIO: El juego arranca en el menú
-        self.jugador_elegido = None         ## CAMBIO: Variable para guardar tu ficha
+        self.set_mouse_visible(True)        
+        self.estado = ESTADO_MENU           
+        self.jugador_elegido = None         
+        self.nombre = ""  ## NUEVO: Variable para guardar tu nombre
         
         self.background = None
         self.usar_imagen_fondo = False
@@ -66,8 +68,7 @@ class OcaGame(arcade.Window):
         self.jugadores = [Ficha(i, PLAYER_IMAGES[i]) for i in range(4)]
         self.turno_actual = 0
 
-    # --- REINTEGRACIÓN PREGUNTAS: Variables de control ---
-        # ========================================================
+        # --- PREGUNTAS: Variables de control ---
         self.mostrando_pregunta = False  
         self.pregunta_actual = None      
         self.botones_rects = []          
@@ -75,6 +76,7 @@ class OcaGame(arcade.Window):
         self.tiempo_feedback = 0         
         self.lista_preguntas = []
         self.cargar_preguntas_json()
+        
         # --- CONTROL DEL DADO VISUAL ---
         self.dado_animacion_activa = False
         self.dado_timer = 0.0
@@ -95,12 +97,10 @@ class OcaGame(arcade.Window):
         except Exception:
             if es_fondo: self.background_color = arcade.color.GRAY
 
-
-        # --- REINTEGRACIÓN PREGUNTAS: Cargar JSON ---
     def cargar_preguntas_json(self):
         try:
-           ruta_json = os.path.join("assets", "preguntas.json")
-           with open(ruta_json, "r", encoding="utf-8") as archivo:
+            ruta_json = os.path.join("assets", "preguntas.json")
+            with open(ruta_json, "r", encoding="utf-8") as archivo:
                 datos = json.load(archivo)
                 self.lista_preguntas = datos["preguntas"]
                 print(f"¡Éxito! Se han cargado {len(self.lista_preguntas)} preguntas.")
@@ -149,8 +149,6 @@ class OcaGame(arcade.Window):
                 return x, y
         return 0, 0
 
-
-    # --- REINTEGRACIÓN PREGUNTAS: Preparar la pregunta ---
     def activar_pregunta(self):
         self.mostrando_pregunta = True
         self.resultado_quiz = None
@@ -169,7 +167,6 @@ class OcaGame(arcade.Window):
             x = cx - (ancho_btn // 2)
             self.botones_rects.append((x, y, ancho_btn, alto_btn))
 
-    ## --- BLOQUE NUEVO ---
     def on_mouse_press(self, x, y, button, modifiers):
         if self.estado == ESTADO_MENU:
             for i in range(4):
@@ -179,9 +176,9 @@ class OcaGame(arcade.Window):
                 distancia = math.sqrt((x - cx)**2 + (y - cy)**2) 
                 if distancia < 80:
                     self.jugador_elegido = i
-                    self.turno_actual = i               ## CAMBIO: Forzamos que el turno inicial sea el de tu ficha
-                    self.estado = ESTADO_JUEGO
-                    print(f"Elegido: {i}")
+                    self.turno_actual = i              
+                    self.estado = ESTADO_NOMBRE  ## CAMBIO: Pasamos a pedir el nombre
+                    print(f"Elegido: {i}. Pasando a pedir nombre...")
         
         elif self.estado == ESTADO_JUEGO and self.mostrando_pregunta:
             if self.resultado_quiz is None:
@@ -202,6 +199,13 @@ class OcaGame(arcade.Window):
                 self.tiempo_feedback = 0 
                 self.resultado_quiz = None
 
+    ## --- NUEVA FUNCIÓN: Captura de texto ---
+    def on_text(self, text):
+        if self.estado == ESTADO_NOMBRE:
+            if len(self.nombre) < 15: # Límite de 15 caracteres
+                if text.isprintable() and text != '\r':
+                    self.nombre += text
+
     def on_update(self, delta_time):
         if self.resultado_quiz is not None:
             self.tiempo_feedback += delta_time
@@ -216,13 +220,22 @@ class OcaGame(arcade.Window):
                 self.dado_animacion_activa = False
 
     def on_key_press(self, key, modifiers):
+        # --- BLOQUE NUEVO PARA ESCRIBIR EL NOMBRE ---
+        if self.estado == ESTADO_NOMBRE:
+            if key == arcade.key.ENTER:
+                if self.nombre.strip() == "":
+                    self.nombre = "Jugador 1"
+                self.estado = ESTADO_JUEGO
+            elif key == arcade.key.BACKSPACE:
+                self.nombre = self.nombre[:-1]
+            return # Salimos para no procesar otras teclas mientras escribimos
+        
         if key == arcade.key.ESCAPE:
             self.close()
         elif key == arcade.key.F11:
             self.set_fullscreen(not self.fullscreen)
             self.set_mouse_visible(True)
             
-        # CAMBIO: Solo movemos la ficha seleccionada y eliminamos el cambio de turno
         if self.estado == ESTADO_JUEGO and key == arcade.key.SPACE:
             if not self.mostrando_pregunta:
                 jugador = self.jugadores[self.jugador_elegido] 
@@ -249,37 +262,40 @@ class OcaGame(arcade.Window):
         if self.usar_imagen_fondo and self.background:
             arcade.draw_texture_rect(self.background, arcade.XYWH(self.width / 2, self.height / 2, self.width, self.height))
 
-        # --- CAMBIO: Lógica para elegir qué dibujar ---
+        # --- Lógica de renderizado por estados ---
         if self.estado == ESTADO_MENU:
-            self.dibujar_menu()             ## CAMBIO: Llamada a la nueva pantalla
-        else:
-            self.dibujar_tablero_y_fichas() ## CAMBIO: Llamada a la lógica original
+            self.dibujar_menu()            
+        elif self.estado == ESTADO_NOMBRE:
+            self.dibujar_ingreso_nombre()
+        elif self.estado == ESTADO_JUEGO:
+            self.dibujar_tablero_y_fichas()
         
         if self.mostrando_pregunta and self.pregunta_actual:
             self.dibujar_capa_pregunta()
+            
         if getattr(self, "dado_animacion_activa", False):
-                    cx = self.width // 4
-                    cy = self.height // 2
-                    
-                    arcade.draw_rect_filled(arcade.XYWH(cx, cy, 250, 250), (0, 0, 0, 220))
-                    arcade.draw_rect_outline(arcade.XYWH(cx, cy, 250, 250), arcade.color.WHITE, 5)
-                    
-                    if self.dado_timer > 0.5:
-                        valor_mostrar = random.randint(1, 6)
-                        texto_dado = "TIRANDO..."
-                        color_texto = arcade.color.WHITE
-                    else:
-                        valor_mostrar = self.dado_valor_final
-                        texto_dado = "¡RESULTADO!"
-                        color_texto = arcade.color.GOLD
-                        
-                    arcade.draw_text(str(valor_mostrar), cx, cy - 20, color_texto, 
-                                    120, anchor_x="center", anchor_y="center", bold=True)
-                    
-                    arcade.draw_text(texto_dado, cx, cy - 160, arcade.color.WHITE, 
-                                    24, anchor_x="center", anchor_y="center", bold=True)
-    ## --- FUNCIÓN NUEVA ---
-    def dibujar_menu(self):                 ## CAMBIO: Bloque nuevo para la visual del menú
+            cx = self.width // 4
+            cy = self.height // 2
+            
+            arcade.draw_rect_filled(arcade.XYWH(cx, cy, 250, 250), (0, 0, 0, 220))
+            arcade.draw_rect_outline(arcade.XYWH(cx, cy, 250, 250), arcade.color.WHITE, 5)
+            
+            if self.dado_timer > 0.5:
+                valor_mostrar = random.randint(1, 6)
+                texto_dado = "TIRANDO..."
+                color_texto = arcade.color.WHITE
+            else:
+                valor_mostrar = self.dado_valor_final
+                texto_dado = "¡RESULTADO!"
+                color_texto = arcade.color.GOLD
+                
+            arcade.draw_text(str(valor_mostrar), cx, cy - 20, color_texto, 
+                            120, anchor_x="center", anchor_y="center", bold=True)
+            
+            arcade.draw_text(texto_dado, cx, cy - 160, arcade.color.WHITE, 
+                            24, anchor_x="center", anchor_y="center", bold=True)
+
+    def dibujar_menu(self):                
         arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), (0, 0, 0, 150))
         arcade.draw_text("SELECCIONA TU CATEGORÍA", self.width // 2, self.height // 2 + 200,
                          arcade.color.WHITE, 45, anchor_x="center", bold=True)
@@ -291,6 +307,19 @@ class OcaGame(arcade.Window):
             if self.jugadores[i].texture:
                 arcade.draw_texture_rect(self.jugadores[i].texture, arcade.XYWH(cx, cy, 120, 120))
             arcade.draw_text(nombres[i], cx, cy - 100, arcade.color.WHITE, 18, anchor_x="center", bold=True)
+
+    ## --- NUEVA FUNCIÓN: Dibujar el ingreso de nombre ---
+    def dibujar_ingreso_nombre(self):
+        arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), (0, 0, 0, 180))
+        arcade.draw_text("INTRODUCE TU NOMBRE:", self.width // 2, self.height // 2 + 50,
+                         arcade.color.WHITE, 35, anchor_x="center", bold=True)
+        
+        # Dibujamos el nombre con una barra baja al final
+        arcade.draw_text(self.nombre + "_", self.width // 2, self.height // 2 - 20,
+                         arcade.color.GOLD, 45, anchor_x="center", bold=True)
+        
+        arcade.draw_text("Pulsa ENTER para comenzar", self.width // 2, self.height // 2 - 100,
+                         arcade.color.GRAY, 20, anchor_x="center")
 
     def dibujar_tablero_y_fichas(self):
         off_x, off_y = self.obtener_offsets()
@@ -306,23 +335,22 @@ class OcaGame(arcade.Window):
             arcade.draw_text(str(num), x + CELL_SIZE/2, y + CELL_SIZE/2, arcade.color.BLACK, 24, anchor_x="center", bold=True)
 
         for i, jugador in enumerate(self.jugadores):
-            if i == self.jugador_elegido: ## CAMBIO: Condición para dibujar solo a tu jugador
+            if i == self.jugador_elegido: 
                 posX, posY = self.obtener_coordenadas_casilla(jugador.casilla_actual)
-                dx, dy = 0, 0 ## CAMBIO: Centramos la ficha anulando el desfase
+                dx, dy = 0, 0 
                 if jugador.texture:
                     arcade.draw_texture_rect(jugador.texture, arcade.XYWH(posX + dx, posY + dy, 60, 60))
                 
-                # --- CAMBIO: Bloque nuevo para indicar quién es el jugador ---
                 arcade.draw_text("TÚ", posX + dx, posY + dy + 45, arcade.color.WHITE, 14, anchor_x="center", bold=True)
 
         nombres = ["Arte", "Ciencia", "Historia", "Geografía"]
-        texto = f"Turno: {nombres[self.jugador_elegido]} - Pulsa ESPACIO" ## CAMBIO: Mostrar solo tu nombre
+        texto = f"Turno: {nombres[self.jugador_elegido]} - Pulsa ESPACIO" 
         arcade.draw_text(texto, self.width // 2, 60, arcade.color.WHITE, 24, anchor_x="center", bold=True)
 
-        nombres = ["Arte", "Ciencia", "Historia", "Geografía"]
-        texto = f"Turno: {nombres[self.turno_actual]} - Pulsa ESPACIO"
-        arcade.draw_text(texto, self.width // 2, 60, arcade.color.WHITE, 24, anchor_x="center", bold=True)
-    
+        # --- NUEVO: Mostrar el nombre del jugador en la esquina ---
+        arcade.draw_text(f"Jugador: {self.nombre}", 20, self.height - 40, 
+                         arcade.color.WHITE, 22, bold=True)
+
     def dibujar_capa_pregunta(self):
         arcade.draw_lbwh_rectangle_filled(0, 0, self.width, self.height, (0, 0, 0, 230))
         cx = self.width // 2
