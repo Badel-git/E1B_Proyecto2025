@@ -4,6 +4,7 @@ import urllib.request
 import random
 import math  ## Librería para calcular distancias de clics
 import json
+import datetime
 
 # --- 1. CONFIGURACIÓN ---
 file_path = os.path.dirname(os.path.abspath(__file__))
@@ -107,6 +108,50 @@ class OcaGame(arcade.Window):
         except Exception as e:
             print(f"ERROR cargando JSON: {e}")
             self.lista_preguntas = [{"pregunta": "Error: No se leyó preguntas.json", "opciones": ["A", "B", "C", "D"], "correcta": "A"}]
+
+    def cargar_ranking(self):
+        ruta_ranking = os.path.join("assets", "ranking.json")
+        
+        # Si el archivo no existe (primera vez jugando), devolvemos lista vacía
+        if not os.path.exists(ruta_ranking):
+            return []
+            
+        try:
+            with open(ruta_ranking, "r", encoding="utf-8") as archivo:
+                return json.load(archivo)
+        except Exception:
+            return []
+        
+    def guardar_puntuacion(self, nombre, categoria, tiradas):
+        # 1. Leer todo lo que hay
+        ranking = self.cargar_ranking()
+        
+        # 2. Añadir lo nuevo
+        nuevo_record = {
+            "nombre": nombre,
+            "categoria": categoria,
+            "tiradas": tiradas,
+            "fecha": str(datetime.date.today())  # Formato YYYY-MM-DD automático
+        }
+        ranking.append(nuevo_record)
+        
+        # 3. Sobrescribir el archivo
+        ruta_ranking = os.path.join("assets", "ranking.json")
+        try:
+            with open(ruta_ranking, "w", encoding="utf-8") as archivo:
+                json.dump(ranking, archivo, indent=4, ensure_ascii=False)
+        except Exception as e:
+            print(f"Error al guardar puntuación: {e}")
+
+    def obtener_top_10(self):
+        # 1. Cargar lista
+        ranking = self.cargar_ranking()
+        
+        # 2. Ordenar (gana quien tiene MENOS tiradas)
+        ranking.sort(key=lambda x: x['tiradas'])
+        
+        # 3. Devolver los 10 primeros
+        return ranking[:10]
 
     def generar_espiral(self):
         total_casillas = 36
