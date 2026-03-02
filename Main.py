@@ -2,7 +2,7 @@ import arcade
 import os
 import urllib.request
 import random
-import math  ## Librería para calcular distancias de clics
+import math  # Librería para calcular distancias de clics
 import json
 import datetime
 
@@ -28,16 +28,18 @@ PLAYER_IMAGES = [
 # --- ESTADOS DEL JUEGO ---
 ESTADO_MENU = 0                    
 ESTADO_JUEGO = 1                   
-ESTADO_NOMBRE = 2   ## NUEVO: Pantalla para escribir el nombre
+ESTADO_NOMBRE = 2   # Pantalla para escribir el nombre
 
 class Dado:
     def tirar(self):
+        """Genera un número aleatorio entre 1 y 6 para el movimiento."""
         return random.randint(1,6)
     
 dado = Dado()
 
 class Ficha:
     def __init__(self, ID, image_path):
+        """Inicializa los datos de cada jugador (ID, casilla actual, imagen)."""
         self.ID = ID
         self.casilla_actual = 0
         self.radio = 25
@@ -49,12 +51,13 @@ class Ficha:
 
 class OcaGame(arcade.Window):
     def __init__(self):
+        """Configura la ventana principal y prepara todas las variables iniciales del juego."""
         super().__init__(title=SCREEN_TITLE, fullscreen=True)
         
         self.set_mouse_visible(True)        
         self.estado = ESTADO_MENU           
         self.jugador_elegido = None         
-        self.nombre = ""  ## NUEVO: Variable para guardar tu nombre
+        self.nombre = ""  # Variable para guardar tu nombre
         
         self.background = None
         self.usar_imagen_fondo = False
@@ -84,6 +87,7 @@ class OcaGame(arcade.Window):
         self.dado_valor_final = 1
 
     def cargar_textura_ninja(self, url, nombre_temp, es_fondo):
+        """Descarga una imagen de internet temporalmente para usarla en el juego y luego borra el archivo."""
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             with urllib.request.urlopen(req) as response, open(nombre_temp, 'wb') as out_file:
@@ -99,20 +103,32 @@ class OcaGame(arcade.Window):
             if es_fondo: self.background_color = arcade.color.GRAY
 
     def cargar_preguntas_json(self):
+        """Lee el archivo JSON. Mantiene la estructura original de tu código para el filtrado, pero incluye candados de seguridad."""
+        self.lista_preguntas = []
+        ruta_json = os.path.join("assets", "preguntas.json")
+
+        if not os.path.exists(ruta_json):
+            print("[INFO] preguntas.json no existe. Activando Modo Oca Clásica.")
+            return
+
         try:
-            ruta_json = os.path.join("assets", "preguntas.json")
             with open(ruta_json, "r", encoding="utf-8") as archivo:
                 datos = json.load(archivo)
-                self.lista_preguntas = datos["preguntas"]
-                print(f"¡Éxito! Se han cargado {len(self.lista_preguntas)} preguntas.")
+                # Guardamos la estructura cruda del JSON (las categorías enteras) para que tu función activar_pregunta() las filtre luego
+                self.lista_preguntas = datos.get("preguntas", [])
+                
+            if len(self.lista_preguntas) == 0:
+                print("[INFO] JSON vacío o formato incorrecto. Activando Modo Oca Clásica.")
+            else:
+                print(f"[OK] Se han cargado {len(self.lista_preguntas)} categorías de preguntas.")
+
         except Exception as e:
-            print(f"ERROR cargando JSON: {e}")
-            self.lista_preguntas = [{"pregunta": "Error: No se leyó preguntas.json", "opciones": ["A", "B", "C", "D"], "correcta": "A"}]
+            print(f"[ERROR] Fallo al leer el JSON: {e}. Activando Modo Oca Clásica.")
+            self.lista_preguntas = []
 
     def cargar_ranking(self):
+        """Lee el archivo de puntuaciones. Si no existe, devuelve una lista vacía."""
         ruta_ranking = os.path.join("assets", "ranking.json")
-        
-        # Si el archivo no existe (primera vez jugando), devolvemos lista vacía
         if not os.path.exists(ruta_ranking):
             return []
             
@@ -123,19 +139,16 @@ class OcaGame(arcade.Window):
             return []
         
     def guardar_puntuacion(self, nombre, categoria, tiradas):
-        # 1. Leer todo lo que hay
+        """Guarda la puntuación de un jugador al finalizar la partida en el archivo de ranking."""
         ranking = self.cargar_ranking()
-        
-        # 2. Añadir lo nuevo
         nuevo_record = {
             "nombre": nombre,
             "categoria": categoria,
             "tiradas": tiradas,
-            "fecha": str(datetime.date.today())  # Formato YYYY-MM-DD automático
+            "fecha": str(datetime.date.today())
         }
         ranking.append(nuevo_record)
         
-        # 3. Sobrescribir el archivo
         ruta_ranking = os.path.join("assets", "ranking.json")
         try:
             with open(ruta_ranking, "w", encoding="utf-8") as archivo:
@@ -144,16 +157,13 @@ class OcaGame(arcade.Window):
             print(f"Error al guardar puntuación: {e}")
 
     def obtener_top_10(self):
-        # 1. Cargar lista
+        """Devuelve los 10 mejores jugadores ordenados por el menor número de tiradas."""
         ranking = self.cargar_ranking()
-        
-        # 2. Ordenar (gana quien tiene MENOS tiradas)
         ranking.sort(key=lambda x: x['tiradas'])
-        
-        # 3. Devolver los 10 primeros
         return ranking[:10]
 
     def generar_espiral(self):
+        """Calcula matemáticamente las posiciones en el tablero para formar una espiral de 36 casillas."""
         total_casillas = 36
         col_inicio, col_fin, fila_inicio, fila_fin = 0, 5, 0, 5
         n = 1
@@ -176,6 +186,7 @@ class OcaGame(arcade.Window):
             col_inicio += 1
 
     def obtener_offsets(self):
+        """Calcula el margen para centrar el tablero perfectamente en la pantalla."""
         tablero_ancho = 6 * (CELL_SIZE + MARGIN)
         tablero_alto = 6 * (CELL_SIZE + MARGIN)
         off_x = (self.width - tablero_ancho) // 2
@@ -183,6 +194,7 @@ class OcaGame(arcade.Window):
         return off_x, off_y
 
     def obtener_coordenadas_casilla(self, numero_casilla):
+        """Devuelve las coordenadas exactas X e Y de la pantalla donde debe dibujarse una casilla concreta."""
         if numero_casilla == 0:
             off_x, _ = self.obtener_offsets()
             return off_x - 100, self.height // 2 
@@ -195,18 +207,17 @@ class OcaGame(arcade.Window):
         return 0, 0
 
     def activar_pregunta(self):
+        """Filtra la pregunta según la categoría de la ficha del jugador y prepara la pantalla."""
         self.mostrando_pregunta = True
         self.resultado_quiz = None
         
         # 1. Enlazamos la ficha (0, 1, 2, 3) con la categoría exacta de tu JSON.
-        # Ficha 0 = Peluquería (antes Obra), Ficha 1 = Estética, Ficha 2 = Informática, Ficha 3 = Madera
         categorias = ["Peluquería", "Estética", "Informática", "Madera"]
         categoria_elegida = categorias[self.jugador_elegido]
 
         # 2. Buscamos el bloque de esa categoría en el JSON y sacamos sus "items"
         preguntas_de_esta_categoria = []
         for bloque in self.lista_preguntas:
-            # Comparamos ignorando mayúsculas/minúsculas
             if isinstance(bloque, dict) and bloque.get("categoria", "").lower() == categoria_elegida.lower():
                 preguntas_de_esta_categoria = bloque.get("items", [])
                 break
@@ -215,7 +226,7 @@ class OcaGame(arcade.Window):
         if preguntas_de_esta_categoria:
             self.pregunta_actual = random.choice(preguntas_de_esta_categoria)
         else:
-            # Plan de emergencia para que el juego NO pete si hay un error de texto
+            # Plan de emergencia (nunca debería ocurrir gracias a los candados)
             self.pregunta_actual = {
                 "pregunta": f"Error: No se encontraron preguntas para {categoria_elegida}", 
                 "opciones": ["A", "B", "C", "D"], 
@@ -235,6 +246,7 @@ class OcaGame(arcade.Window):
             self.botones_rects.append((x, y, ancho_btn, alto_btn))
 
     def on_mouse_press(self, x, y, button, modifiers):
+        """Detecta los clics del ratón para elegir la ficha en el menú o para responder a las preguntas."""
         if self.estado == ESTADO_MENU:
             for i in range(4):
                 cx = self.width // 2 - 300 + (i * 200)
@@ -244,7 +256,7 @@ class OcaGame(arcade.Window):
                 if distancia < 80:
                     self.jugador_elegido = i
                     self.turno_actual = i              
-                    self.estado = ESTADO_NOMBRE  ## CAMBIO: Pasamos a pedir el nombre
+                    self.estado = ESTADO_NOMBRE 
                     print(f"Elegido: {i}. Pasando a pedir nombre...")
         
         elif self.estado == ESTADO_JUEGO and self.mostrando_pregunta:
@@ -266,14 +278,15 @@ class OcaGame(arcade.Window):
                 self.tiempo_feedback = 0 
                 self.resultado_quiz = None
 
-    ## --- NUEVA FUNCIÓN: Captura de texto ---
     def on_text(self, text):
+        """Captura las teclas que pulsa el usuario para escribir su nombre."""
         if self.estado == ESTADO_NOMBRE:
             if len(self.nombre) < 15: # Límite de 15 caracteres
                 if text.isprintable() and text != '\r':
                     self.nombre += text
 
     def on_update(self, delta_time):
+        """Se ejecuta constantemente para actualizar los tiempos."""
         if self.resultado_quiz is not None:
             self.tiempo_feedback += delta_time
             if self.tiempo_feedback > 2.0:
@@ -287,7 +300,7 @@ class OcaGame(arcade.Window):
                 self.dado_animacion_activa = False
 
     def on_key_press(self, key, modifiers):
-        # --- BLOQUE NUEVO PARA ESCRIBIR EL NOMBRE ---
+        """Detecta las teclas especiales: ENTER, ESPACIO, ESCAPE, F11."""
         if self.estado == ESTADO_NOMBRE:
             if key == arcade.key.ENTER:
                 if self.nombre.strip() == "":
@@ -295,7 +308,7 @@ class OcaGame(arcade.Window):
                 self.estado = ESTADO_JUEGO
             elif key == arcade.key.BACKSPACE:
                 self.nombre = self.nombre[:-1]
-            return # Salimos para no procesar otras teclas mientras escribimos
+            return 
         
         if key == arcade.key.ESCAPE:
             self.close()
@@ -314,22 +327,22 @@ class OcaGame(arcade.Window):
                 if jugador.casilla_actual < 36:
                     jugador.casilla_actual += pasos
                 
-                # Lanzar pregunta si se mueve (y no es la meta ni el inicio)
+                # Lanzar pregunta si se mueve (y si hay preguntas cargadas)
                 if 0 < jugador.casilla_actual < 36:
-                    self.activar_pregunta()
+                    if len(self.lista_preguntas) > 0:
+                        self.activar_pregunta()
                     
-            # Si la pregunta está abierta y respondida, ESPACIO la cierra
             elif self.mostrando_pregunta and self.resultado_quiz is not None:
                 self.mostrando_pregunta = False
                 self.tiempo_feedback = 0
                 self.resultado_quiz = None
 
     def on_draw(self):
+        """Función principal de dibujado."""
         self.clear()
         if self.usar_imagen_fondo and self.background:
             arcade.draw_texture_rect(self.background, arcade.XYWH(self.width / 2, self.height / 2, self.width, self.height))
 
-        # --- Lógica de renderizado por estados ---
         if self.estado == ESTADO_MENU:
             self.dibujar_menu()            
         elif self.estado == ESTADO_NOMBRE:
@@ -363,6 +376,7 @@ class OcaGame(arcade.Window):
                             24, anchor_x="center", anchor_y="center", bold=True)
 
     def dibujar_menu(self):                
+        """Dibuja la pantalla inicial."""
         arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), (0, 0, 0, 150))
         arcade.draw_text("SELECCIONA TU CATEGORÍA", self.width // 2, self.height // 2 + 200,
                          arcade.color.WHITE, 45, anchor_x="center", bold=True)
@@ -375,13 +389,12 @@ class OcaGame(arcade.Window):
                 arcade.draw_texture_rect(self.jugadores[i].texture, arcade.XYWH(cx, cy, 120, 120))
             arcade.draw_text(nombres[i], cx, cy - 100, arcade.color.WHITE, 18, anchor_x="center", bold=True)
 
-    ## --- NUEVA FUNCIÓN: Dibujar el ingreso de nombre ---
     def dibujar_ingreso_nombre(self):
+        """Dibuja la pantalla donde el jugador escribe su nombre."""
         arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), (0, 0, 0, 180))
         arcade.draw_text("INTRODUCE TU NOMBRE:", self.width // 2, self.height // 2 + 50,
                          arcade.color.WHITE, 35, anchor_x="center", bold=True)
         
-        # Dibujamos el nombre con una barra baja al final
         arcade.draw_text(self.nombre + "_", self.width // 2, self.height // 2 - 20,
                          arcade.color.GOLD, 45, anchor_x="center", bold=True)
         
@@ -389,6 +402,7 @@ class OcaGame(arcade.Window):
                          arcade.color.GRAY, 20, anchor_x="center")
 
     def dibujar_tablero_y_fichas(self):
+        """Dibuja las casillas y la ficha del jugador."""
         off_x, off_y = self.obtener_offsets()
         for col, fila, num in self.camino:
             x, y = off_x + col * (CELL_SIZE + MARGIN), off_y - fila * (CELL_SIZE + MARGIN)
@@ -414,11 +428,11 @@ class OcaGame(arcade.Window):
         texto = f"Turno: {nombres[self.jugador_elegido]} - Pulsa ESPACIO" 
         arcade.draw_text(texto, self.width // 2, 60, arcade.color.WHITE, 24, anchor_x="center", bold=True)
 
-        # --- NUEVO: Mostrar el nombre del jugador en la esquina ---
         arcade.draw_text(f"Jugador: {self.nombre}", 20, self.height - 40, 
                          arcade.color.WHITE, 22, bold=True)
 
     def dibujar_capa_pregunta(self):
+        """Oscurece el fondo y dibuja la interfaz de preguntas."""
         arcade.draw_lbwh_rectangle_filled(0, 0, self.width, self.height, (0, 0, 0, 230))
         cx = self.width // 2
         cy = self.height // 2
@@ -461,6 +475,7 @@ class OcaGame(arcade.Window):
             arcade.draw_text(texto_res, cx, cy + 300, color_res, 40, anchor_x="center", bold=True)
 
 def main():
+    """Función de arranque."""
     OcaGame()
     arcade.run()
 
