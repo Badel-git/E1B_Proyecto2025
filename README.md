@@ -70,3 +70,47 @@ Dale a "Create Pull Request".
 Revisión: Pide a un compañero que revise, y si todo está bien, le dé a Review changes -> Approve.
 
 Merge: Una vez aprobado, aparecerá el botón "Merge pull request". Púlsalo y luego "Confirm merge".
+
+# Posibles errores y solución.
+Si al hacer un git pull origin "main" nos da un mensaje de error como el siguiente:
+
+From https://github.com/Badel-git/E1B_Proyecto2025
+ * branch            main       -> FETCH_HEAD
+Updating c7f5f00..0193e83
+error: Your local changes to the following files would be overwritten by merge:
+        Main.py
+Please commit your changes or stash them before you merge.
+Aborting
+
+*¿Por qué ocurre? Git detecta que hay modificaciones locales (a veces invisibles, como un simple salto de línea del editor) y detiene la descarga para no sobreescribir ni borrar tu trabajo sin querer.*
+
+Podemos solucionarlo con las siguientes dos opciones:
+
+A. Restaura el archivo a su estado original (esto borrará tu cambio local):
+Si no haz hecho nada en local puedes dejarlo como estaba al principio y restaurarlo al último pull.
+
+> Terminal  
+`git restore Main.py`
+`git pull origin "main"`
+
+*(Nota: Estar 100% de que no haz hecho nada importante en local).*
+
+B. Guardar temporalmente tu modificación:
+En caso de que sí hayas hecho modificaciones importantes y no quieras perderlas, puedes guardarlas temporalmente en un "cajón" (stash), actualizar el repositorio y luego recuperar tus cambios.
+
+1. Guarda tus modificaciones temporalmente:
+
+Terminal
+`git stash`
+
+2. Ahora que tu zona de trabajo está limpia, descarga la última versión:
+
+Terminal
+`git pull origin "main"`
+
+3. Recupera tus modificaciones guardadas en el "cajón":
+
+Terminal
+`git stash pop`
+
+(Nota: Si al hacer el pop el código que tenías choca con el nuevo que has descargado, Git te avisará de un conflicto. Solo tienes que abrir el archivo, corregirlo manualmente y guardar).
