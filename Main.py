@@ -19,10 +19,10 @@ CELL_SIZE = 120
 MARGIN = 5
 
 PLAYER_IMAGES = [
-    os.path.join("assets", "img", "ficha", "Ficha_Arte-sinfondo.png"),
-    os.path.join("assets", "img", "ficha", "FICHA_CIENCIA-sinfondo.png"),
-    os.path.join("assets", "img", "ficha", "Ficha_Historia-sinfondo.png"),
-    os.path.join("assets", "img", "ficha", "Ficha_Geografia-sinfondo.png")
+    os.path.join("assets", "img", "ficha", "Ficha_obra.png"),
+    os.path.join("assets", "img", "ficha", "Ficha_estetica.png"),
+    os.path.join("assets", "img", "ficha", "Ficha_informatica.png"),
+    os.path.join("assets", "img", "ficha", "Ficha_madera.png")
 ]
 
 # --- ESTADOS DEL JUEGO ---
@@ -198,9 +198,31 @@ class OcaGame(arcade.Window):
         self.mostrando_pregunta = True
         self.resultado_quiz = None
         
-        if self.lista_preguntas:
-            self.pregunta_actual = random.choice(self.lista_preguntas)
+        # 1. Enlazamos la ficha (0, 1, 2, 3) con la categoría exacta de tu JSON.
+        # Ficha 0 = Peluquería (antes Obra), Ficha 1 = Estética, Ficha 2 = Informática, Ficha 3 = Madera
+        categorias = ["Peluquería", "Estética", "Informática", "Madera"]
+        categoria_elegida = categorias[self.jugador_elegido]
+
+        # 2. Buscamos el bloque de esa categoría en el JSON y sacamos sus "items"
+        preguntas_de_esta_categoria = []
+        for bloque in self.lista_preguntas:
+            # Comparamos ignorando mayúsculas/minúsculas
+            if isinstance(bloque, dict) and bloque.get("categoria", "").lower() == categoria_elegida.lower():
+                preguntas_de_esta_categoria = bloque.get("items", [])
+                break
         
+        # 3. Elegimos una pregunta al azar SOLO de esos "items"
+        if preguntas_de_esta_categoria:
+            self.pregunta_actual = random.choice(preguntas_de_esta_categoria)
+        else:
+            # Plan de emergencia para que el juego NO pete si hay un error de texto
+            self.pregunta_actual = {
+                "pregunta": f"Error: No se encontraron preguntas para {categoria_elegida}", 
+                "opciones": ["A", "B", "C", "D"], 
+                "correcta": "A"
+            }
+        
+        # 4. Generamos las posiciones de los botones
         self.botones_rects = []
         cx = self.width // 2
         cy = self.height // 2
@@ -345,7 +367,7 @@ class OcaGame(arcade.Window):
         arcade.draw_text("SELECCIONA TU CATEGORÍA", self.width // 2, self.height // 2 + 200,
                          arcade.color.WHITE, 45, anchor_x="center", bold=True)
         
-        nombres = ["ARTE", "CIENCIA", "HISTORIA", "GEOGRAFÍA"]
+        nombres = ["OBRA", "ESTÉTICA", "INFORMÁTICA", "MADERA"]
         for i in range(4):
             cx = self.width // 2 - 300 + (i * 200)
             cy = self.height // 2
@@ -388,7 +410,7 @@ class OcaGame(arcade.Window):
                 
                 arcade.draw_text("TÚ", posX + dx, posY + dy + 45, arcade.color.WHITE, 14, anchor_x="center", bold=True)
 
-        nombres = ["Arte", "Ciencia", "Historia", "Geografía"]
+        nombres = ["OBRA", "ESTÉTICA", "INFORMÁTICA", "MADERA"]
         texto = f"Turno: {nombres[self.jugador_elegido]} - Pulsa ESPACIO" 
         arcade.draw_text(texto, self.width // 2, 60, arcade.color.WHITE, 24, anchor_x="center", bold=True)
 

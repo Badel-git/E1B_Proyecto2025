@@ -1,184 +1,104 @@
 {
   "preguntas": [
     {
-      "categoria": "Historia",
-      "pregunta": "¿Quién descubrió América?",
-      "opciones": ["Marco Polo", "Cristóbal Colón", "Hernán Cortés", "Napoleón"],
-      "correcta": "B"
+      "categoria": "Estética",
+      "items": [
+        { "pregunta": "¿Cuál es la capa más externa de la piel?", "opciones": ["Dermis", "Hipodermis", "Epidermis", "Tejido adiposo"], "correcta": "C" },
+        { "pregunta": "¿Qué tipo de piel produce exceso de sebo?", "opciones": ["Seca", "Mixta", "Grasa", "Normal"], "correcta": "C" },
+        { "pregunta": "¿Qué vitamina favorece la producción de colágeno?", "opciones": ["A", "B12", "C", "K"], "correcta": "C" },
+        { "pregunta": "¿Qué producto se aplica antes de la base de maquillaje?", "opciones": ["Corrector", "Primer", "Polvos", "Rubor"], "correcta": "B" },
+        { "pregunta": "¿Qué técnica elimina el vello desde la raíz?", "opciones": ["Afeitado", "Cera", "Corte", "Peinado"], "correcta": "B" },
+        { "pregunta": "¿Qué tratamiento elimina células muertas?", "opciones": ["Exfoliación", "Tonificación", "Pigmentación", "Masaje"], "correcta": "A" },
+        { "pregunta": "¿Qué factor protege del sol?", "opciones": ["FPS", "pH", "LED", "UVB"], "correcta": "A" },
+        { "pregunta": "¿Qué estructura da firmeza a la piel?", "opciones": ["Melanina", "Colágeno", "Sebum", "Queratina"], "correcta": "B" },
+        { "pregunta": "¿Qué pH tiene la piel sana aproximadamente?", "opciones": ["3", "5.5", "7", "9"], "correcta": "B" },
+        { "pregunta": "¿Qué tratamiento reduce manchas?", "opciones": ["Peeling químico", "Brushing", "Cardado", "Secado"], "correcta": "A" },
+        { "pregunta": "¿Qué tipo de piel combina zonas grasas y secas?", "opciones": ["Normal", "Seca", "Mixta", "Sensible"], "correcta": "C" },
+        { "pregunta": "¿Qué producto hidrata la piel?", "opciones": ["Tónico", "Crema hidratante", "Laca", "Gel"], "correcta": "B" },
+        { "pregunta": "¿Qué rayos causan envejecimiento prematuro?", "opciones": ["UVA", "Gamma", "X", "Infrarrojos"], "correcta": "A" },
+        { "pregunta": "¿Qué aparato usa luz LED facial?", "opciones": ["Lámpara LED", "Secador", "Plancha", "Difusor"], "correcta": "A" },
+        { "pregunta": "¿Qué técnica aplica pigmento en cejas?", "opciones": ["Microblading", "Exfoliación", "Masaje", "Peeling"], "correcta": "A" },
+        { "pregunta": "¿Qué elimina puntos negros?", "opciones": ["Extracción", "Cepillado", "Planchado", "Secado"], "correcta": "A" },
+        { "pregunta": "¿Qué instrumento lima uñas?", "opciones": ["Lima", "Alicates", "Pinza", "Brocha"], "correcta": "A" },
+        { "pregunta": "¿Qué masaje estimula la circulación?", "opciones": ["Circulatorio", "Relajante", "Deportivo", "Linfático"], "correcta": "A" },
+        { "pregunta": "¿Qué producto desinfecta antes de tratamiento?", "opciones": ["Alcohol", "Crema", "Aceite", "Base"], "correcta": "A" },
+        { "pregunta": "¿Qué vitamina aporta el sol?", "opciones": ["A", "C", "D", "B6"], "correcta": "C" }
+      ]
     },
     {
-      "categoria": "Historia",
-      "pregunta": "¿Quién fue el primer presidente de Estados Unidos?",
-      "opciones": ["Thomas Jefferson", "Abraham Lincoln", "George Washington", "John Adams"],
-      "correcta": "C"
+      "categoria": "Peluquería",
+      "items": [
+        { "pregunta": "¿Qué herramienta corta cabello?", "opciones": ["Tijeras", "Plancha", "Peine", "Difusor"], "correcta": "A" },
+        { "pregunta": "¿Qué producto fija el peinado?", "opciones": ["Laca", "Champú", "Mascarilla", "Acondicionador"], "correcta": "A" },
+        { "pregunta": "¿Qué técnica aclara el cabello?", "opciones": ["Mechas", "Lavado", "Corte", "Secado"], "correcta": "A" },
+        { "pregunta": "¿Qué aparato seca el cabello?", "opciones": ["Secador", "Plancha", "Tenaza", "Peine"], "correcta": "A" },
+        { "pregunta": "¿Qué producto nutre profundamente?", "opciones": ["Mascarilla", "Gel", "Laca", "Espuma"], "correcta": "A" },
+        { "pregunta": "¿Qué corte es igualado?", "opciones": ["Recto", "Desfilado", "Escalonado", "Degradado"], "correcta": "A" },
+        { "pregunta": "¿Qué técnica cambia el color?", "opciones": ["Tinte", "Cepillado", "Cardado", "Peinado"], "correcta": "A" },
+        { "pregunta": "¿Qué producto limpia el cabello?", "opciones": ["Champú", "Gel", "Laca", "Sérum"], "correcta": "A" },
+        { "pregunta": "¿Qué herramienta desenreda?", "opciones": ["Cepillo", "Plancha", "Tijeras", "Navaja"], "correcta": "A" },
+        { "pregunta": "¿Qué aporta volumen en raíces?", "opciones": ["Cardado", "Alisado", "Lavado", "Corte"], "correcta": "A" },
+        { "pregunta": "¿Qué aparato alisa?", "opciones": ["Plancha", "Secador", "Peine", "Tenaza"], "correcta": "A" },
+        { "pregunta": "¿Qué protege del calor?", "opciones": ["Protector térmico", "Gel", "Laca", "Tinte"], "correcta": "A" },
+        { "pregunta": "¿Qué suaviza tras champú?", "opciones": ["Acondicionador", "Espuma", "Gel", "Laca"], "correcta": "A" },
+        { "pregunta": "¿Qué perfila contornos?", "opciones": ["Máquina eléctrica", "Peine", "Cepillo", "Secador"], "correcta": "A" },
+        { "pregunta": "¿Qué ondula permanente?", "opciones": ["Permanente", "Brushing", "Plancha", "Corte"], "correcta": "A" },
+        { "pregunta": "¿Qué da brillo?", "opciones": ["Sérum", "Champú", "Agua", "Tijeras"], "correcta": "A" },
+        { "pregunta": "¿Qué divide secciones?", "opciones": ["Peine de púa", "Tenaza", "Secador", "Plancha"], "correcta": "A" },
+        { "pregunta": "¿Qué técnica reduce volumen?", "opciones": ["Desfilado", "Cardado", "Moldeado", "Brushing"], "correcta": "A" },
+        { "pregunta": "¿Qué corte es más corto detrás?", "opciones": ["Bob invertido", "Recto", "Rapado", "Clásico"], "correcta": "A" },
+        { "pregunta": "¿Qué riza temporalmente?", "opciones": ["Tenaza", "Decoloración", "Alisado", "Lavado"], "correcta": "A" }
+      ]
     },
     {
-      "categoria": "Historia",
-      "pregunta": "¿Qué civilización construyó las pirámides de Egipto?",
-      "opciones": ["Egipcia", "Maya", "Romana", "Inca"],
-      "correcta": "A"
+      "categoria": "Informática",
+      "items": [
+        { "pregunta": "¿Qué significa CPU?", "opciones": ["Central Processing Unit", "Computer Personal Unit", "Control Program Unit", "Core Process Utility"], "correcta": "A" },
+        { "pregunta": "¿Qué almacena datos permanentemente?", "opciones": ["Disco duro", "RAM", "Monitor", "Teclado"], "correcta": "A" },
+        { "pregunta": "¿Qué es software?", "opciones": ["Programa", "Cable", "Pantalla", "Hardware"], "correcta": "A" },
+        { "pregunta": "¿Lenguaje para webs?", "opciones": ["HTML", "MP3", "PDF", "JPEG"], "correcta": "A" },
+        { "pregunta": "¿Memoria volátil?", "opciones": ["RAM", "ROM", "SSD", "USB"], "correcta": "A" },
+        { "pregunta": "¿Sistema de Microsoft?", "opciones": ["Windows", "Linux", "macOS", "Android"], "correcta": "A" },
+        { "pregunta": "¿Qué es un virus?", "opciones": ["Programa malicioso", "Antivirus", "Cable", "Monitor"], "correcta": "A" },
+        { "pregunta": "¿Qué procesa datos?", "opciones": ["CPU", "Monitor", "Teclado", "Ratón"], "correcta": "A" },
+        { "pregunta": "¿Qué es navegador?", "opciones": ["Programa de internet", "Cable", "Disco", "Hardware"], "correcta": "A" },
+        { "pregunta": "¿Extensión imagen?", "opciones": [".jpg", ".exe", ".mp3", ".doc"], "correcta": "A" },
+        { "pregunta": "¿Qué es la nube?", "opciones": ["Almacenamiento online", "Cable", "Impresora", "Pantalla"], "correcta": "A" },
+        { "pregunta": "¿Qué significa IP?", "opciones": ["Internet Protocol", "Internal Power", "Image Process", "Input Program"], "correcta": "A" },
+        { "pregunta": "¿Qué es hardware?", "opciones": ["Parte física", "Programa", "Internet", "App"], "correcta": "A" },
+        { "pregunta": "¿Unidad almacenamiento?", "opciones": ["Byte", "Metro", "Litro", "Segundo"], "correcta": "A" },
+        { "pregunta": "¿Qué es firewall?", "opciones": ["Sistema seguridad", "Pantalla", "Cable", "Virus"], "correcta": "A" },
+        { "pregunta": "¿Qué red mundial?", "opciones": ["Internet", "LAN", "USB", "Bluetooth"], "correcta": "A" },
+        { "pregunta": "¿Qué muestra imagen?", "opciones": ["Monitor", "CPU", "RAM", "Teclado"], "correcta": "A" },
+        { "pregunta": "¿Qué significa USB?", "opciones": ["Universal Serial Bus", "Ultra System Boot", "User Service Box", "Unique Base"], "correcta": "A" },
+        { "pregunta": "¿Qué es SSD?", "opciones": ["Solid State Drive", "Secure Disk Data", "System Storage Device", "Soft System Disk"], "correcta": "A" },
+        { "pregunta": "¿Qué es WiFi?", "opciones": ["Wireless Fidelity", "Wide File", "Web Finder", "Wire Fast"], "correcta": "A" }
+      ]
     },
     {
-      "categoria": "Historia",
-      "pregunta": "¿Quién escribió \"Don Quijote de la Mancha\"?",
-      "opciones": ["Federico García Lorca", "Lope de Vega", "Miguel de Cervantes", "Pablo Neruda"],
-      "correcta": "C"
-    },
-    {
-      "categoria": "Historia",
-      "pregunta": "¿Quién pintó \"La Última Cena\"?",
-      "opciones": ["Leonardo da Vinci", "Pablo Picasso", "Miguel Ángel", "Salvador Dalí"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Geografía",
-      "pregunta": "¿Cuál es la capital de España?",
-      "opciones": ["Madrid", "Barcelona", "Sevilla", "Valencia"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Geografía",
-      "pregunta": "¿Cuál es la capital de Francia?",
-      "opciones": ["Lyon", "París", "Marsella", "Niza"],
-      "correcta": "B"
-    },
-    {
-      "categoria": "Geografía",
-      "pregunta": "¿Cuál es el océano más grande?",
-      "opciones": ["Índico", "Atlántico", "Pacífico", "Ártico"],
-      "correcta": "C"
-    },
-    {
-      "categoria": "Geografía",
-      "pregunta": "¿En qué continente está Egipto?",
-      "opciones": ["África", "Asia", "Europa", "América"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Geografía",
-      "pregunta": "¿Qué país es famoso por la Torre Eiffel?",
-      "opciones": ["Francia", "España", "Italia", "Alemania"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Geografía",
-      "pregunta": "¿Cuál es la capital de Japón?",
-      "opciones": ["Osaka", "Kioto", "Tokio", "Hiroshima"],
-      "correcta": "C"
-    },
-    {
-      "categoria": "Geografía",
-      "pregunta": "¿Cuál es la capital de Italia?",
-      "opciones": ["Venecia", "Milán", "Roma", "Florencia"],
-      "correcta": "C"
-    },
-    {
-      "categoria": "Geografía",
-      "pregunta": "¿Qué país es conocido por los canguros?",
-      "opciones": ["Nueva Zelanda", "Australia", "Canadá", "Sudáfrica"],
-      "correcta": "B"
-    },
-    {
-      "categoria": "Geografía",
-      "pregunta": "¿Qué isla es la más grande del mundo?",
-      "opciones": ["Groenlandia", "Madagascar", "Borneo", "Sumatra"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Geografía",
-      "pregunta": "¿Cuál es el río más largo del mundo?",
-      "opciones": ["Amazonas", "Nilo", "Misisipi", "Yangtsé"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Ciencia",
-      "pregunta": "¿Qué planeta está más cerca del Sol?",
-      "opciones": ["Mercurio", "Venus", "Marte", "Júpiter"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Ciencia",
-      "pregunta": "¿Cuál es el planeta rojo?",
-      "opciones": ["Saturno", "Venus", "Marte", "Júpiter"],
-      "correcta": "C"
-    },
-    {
-      "categoria": "Ciencia",
-      "pregunta": "¿Qué gas respiramos los humanos?",
-      "opciones": ["Helio", "Dióxido de carbono", "Oxígeno", "Nitrógeno"],
-      "correcta": "C"
-    },
-    {
-      "categoria": "Ciencia",
-      "pregunta": "¿Cuál es el órgano más grande del cuerpo?",
-      "opciones": ["Piel", "Corazón", "Pulmón", "Hígado"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Ciencia",
-      "pregunta": "¿Cuál es el líquido que bebemos para hidratarnos?",
-      "opciones": ["Agua", "Leche", "Jugo", "Vino"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Arte y Cultura",
-      "pregunta": "¿Quién pintó la Mona Lisa?",
-      "opciones": ["Van Gogh", "Picasso", "Dalí", "Leonardo da Vinci"],
-      "correcta": "D"
-    },
-    {
-      "categoria": "Arte y Cultura",
-      "pregunta": "¿Quién escribió \"Romeo y Julieta\"?",
-      "opciones": ["William Shakespeare", "Cervantes", "Lorca", "Dickens"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Arte y Cultura",
-      "pregunta": "¿Qué instrumento tiene cuerdas y se toca con arco?",
-      "opciones": ["Violín", "Piano", "Guitarra", "Batería"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Arte y Cultura",
-      "pregunta": "¿En qué país se originó el flamenco?",
-      "opciones": ["Italia", "México", "Argentina", "España"],
-      "correcta": "D"
-    },
-    {
-      "categoria": "Arte y Cultura",
-      "pregunta": "¿Quién es famoso por la obra \"Guernica\"?",
-      "opciones": ["Pablo Picasso", "Dalí", "Goya", "Velázquez"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Curiosidades / Cultura general",
-      "pregunta": "¿Cuál es el satélite natural de la Tierra?",
-      "opciones": ["Sol", "Luna", "Marte", "Estrella"],
-      "correcta": "B"
-    },
-    {
-      "categoria": "Curiosidades / Cultura general",
-      "pregunta": "¿Qué fruta es amarilla y alargada?",
-      "opciones": ["Plátano", "Manzana", "Naranja", "Uva"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Curiosidades / Cultura general",
-      "pregunta": "¿Qué animal dice \"miau\"?",
-      "opciones": ["Gato", "Perro", "Vaca", "Caballo"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Curiosidades / Cultura general",
-      "pregunta": "¿Qué animal dice \"guau\"?",
-      "opciones": ["Perro", "Gato", "Oveja", "Pato"],
-      "correcta": "A"
-    },
-    {
-      "categoria": "Curiosidades / Cultura general",
-      "pregunta": "¿Qué invento permite hablar a distancia?",
-      "opciones": ["Teléfono", "Computadora", "Radio", "Televisión"],
-      "correcta": "A"
+      "categoria": "Madera",
+      "items": [
+        { "pregunta": "¿Qué herramienta corta madera?", "opciones": ["Sierra", "Martillo", "Nivel", "Brocha"], "correcta": "A" },
+        { "pregunta": "¿Qué herramienta sirve para lijar?", "opciones": ["Lija", "Clavo", "Taladro", "Pala"], "correcta": "A" },
+        { "pregunta": "¿Qué adhesivo une madera?", "opciones": ["Cola blanca", "Arena", "Yeso", "Agua"], "correcta": "A" },
+        { "pregunta": "¿Qué herramienta perfora madera?", "opciones": ["Taladro", "Martillo", "Nivel", "Rodillo"], "correcta": "A" },
+        { "pregunta": "¿Qué protege contra humedad?", "opciones": ["Barniz", "Cartón", "Papel", "Arena"], "correcta": "A" },
+        { "pregunta": "¿Qué mide ángulos rectos?", "opciones": ["Escuadra", "Brocha", "Lija", "Pala"], "correcta": "A" },
+        { "pregunta": "¿Qué sujeta piezas al encolar?", "opciones": ["Sargento", "Nivel", "Rodillo", "Martillo"], "correcta": "A" },
+        { "pregunta": "¿Qué herramienta talla madera?", "opciones": ["Formón", "Pala", "Hormigonera", "Nivel"], "correcta": "A" },
+        { "pregunta": "¿Qué acabado da brillo?", "opciones": ["Barniz", "Agua", "Arena", "Yeso"], "correcta": "A" },
+        { "pregunta": "¿Qué tablero son láminas encoladas?", "opciones": ["Contrachapado", "Cartón", "Yeso", "Vidrio"], "correcta": "A" },
+        { "pregunta": "¿Qué herramienta marca medidas largas?", "opciones": ["Metro", "Lija", "Pala", "Rodillo"], "correcta": "A" },
+        { "pregunta": "¿Qué herramienta eléctrica corta recto?", "opciones": ["Sierra circular", "Brocha", "Espátula", "Martillo"], "correcta": "A" },
+        { "pregunta": "¿Qué une piezas metálicamente?", "opciones": ["Clavo", "Arena", "Yeso", "Pintura"], "correcta": "A" },
+        { "pregunta": "¿Qué rellena imperfecciones?", "opciones": ["Masilla", "Agua", "Arena", "Cemento"], "correcta": "A" },
+        { "pregunta": "¿Qué elimina astillas?", "opciones": ["Lijado", "Clavado", "Perforado", "Corte"], "correcta": "A" },
+        { "pregunta": "¿Qué madera es resistente en muebles?", "opciones": ["Roble", "Cartón", "Yeso", "Plástico"], "correcta": "A" },
+        { "pregunta": "¿Qué equipo protege ojos?", "opciones": ["Gafas seguridad", "Sombrero", "Bufanda", "Sandalias"], "correcta": "A" },
+        { "pregunta": "¿Qué herramienta hace ranuras?", "opciones": ["Fresadora", "Pala", "Nivel", "Rodillo"], "correcta": "A" },
+        { "pregunta": "¿Qué herramienta clava clavos?", "opciones": ["Martillo", "Sierra", "Taladro", "Lija"], "correcta": "A" },
+        { "pregunta": "¿Qué proceso suaviza superficie?", "opciones": ["Lijado", "Corte", "Clavado", "Pegado"], "correcta": "A" }
+      ]
     }
   ]
 }
