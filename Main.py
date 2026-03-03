@@ -118,7 +118,6 @@ class OcaGame(arcade.Window):
         try:
             with open(ruta_json, "r", encoding="utf-8") as archivo:
                 datos = json.load(archivo)
-                # Guardamos la estructura cruda del JSON para filtrarlas luego
                 self.lista_preguntas = datos.get("preguntas", [])
                 
             if len(self.lista_preguntas) == 0:
@@ -277,8 +276,23 @@ class OcaGame(arcade.Window):
                     if bx < x < bx + bw and by < y < by + bh:
                         if i == idx_correcto:
                             self.resultado_quiz = "CORRECTO"
+                            
+                            # --- NUEVA LÓGICA: AVANCE CONDICIONAL AL ACERTO ---
+                            jugador = self.jugadores[self.jugador_elegido]
+                            # Avanzamos la ficha usando el valor del dado guardado
+                            if jugador.casilla_actual + self.dado_valor_final <= 36:
+                                jugador.casilla_actual += self.dado_valor_final
+                            else:
+                                jugador.casilla_actual = 36 # Tope en la meta
+                                
+                            # Gestión de casillas especiales tras el movimiento
+                            if jugador.casilla_actual in self.casillas_penalizacion:
+                                jugador.casilla_actual = max(1, jugador.casilla_actual - 3)
+                            elif jugador.casilla_actual in self.casillas_turbo:
+                                jugador.casilla_actual = min(36, jugador.casilla_actual + 5)
                         else:
                             self.resultado_quiz = "INCORRECTO"
+                            # Si es incorrecto, no sumamos nada (la ficha se queda donde está)
                         return 
             else:
                 # Cierra la ventana si ya respondiste y haces clic
@@ -341,25 +355,14 @@ class OcaGame(arcade.Window):
             
         if self.estado == ESTADO_JUEGO and key == arcade.key.SPACE:
             if not self.mostrando_pregunta:
-                jugador = self.jugadores[self.jugador_elegido] 
+                # --- NUEVA LÓGICA: Lanzar dado SIN MOVER todavía ---
                 pasos = dado.tirar()
                 self.dado_animacion_activa = True
                 self.dado_timer = 1.5
-                self.dado_valor_final = pasos
+                self.dado_valor_final = pasos # Guardamos el valor para aplicarlo si acierta
                 
-                if jugador.casilla_actual < 36:
-                    jugador.casilla_actual += pasos
-                
-                # Penalización
-                if jugador.casilla_actual in self.casillas_penalizacion:
-                    jugador.casilla_actual = max(1, jugador.casilla_actual - 3)
-                
-                # Turbo
-                if jugador.casilla_actual in self.casillas_turbo:
-                    jugador.casilla_actual = min(36, jugador.casilla_actual + 5)
-                
-                # Lanzar pregunta si se mueve (y si hay preguntas cargadas)
-                if 0 < jugador.casilla_actual < 36:
+                # Lanzar pregunta inmediatamente después de tirar
+                if self.jugadores[self.jugador_elegido].casilla_actual < 36:
                     if len(self.lista_preguntas) > 0:
                         self.activar_pregunta()
                     
@@ -404,10 +407,10 @@ class OcaGame(arcade.Window):
                 color_texto = arcade.color.GOLD
                 
             arcade.draw_text(str(valor_mostrar), cx, cy - 20, color_texto, 
-                            120, anchor_x="center", anchor_y="center", bold=True)
+                                    120, anchor_x="center", anchor_y="center", bold=True)
             
             arcade.draw_text(texto_dado, cx, cy - 160, arcade.color.WHITE, 
-                            24, anchor_x="center", anchor_y="center", bold=True)
+                                    24, anchor_x="center", anchor_y="center", bold=True)
 
     def dibujar_error_fatal(self):
         """Dibuja la pantalla de error crítico y la cuenta atrás para el cierre."""
