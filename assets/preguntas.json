@@ -1,7 +1,7 @@
 {
   "preguntas": [
     {
-      "categoria": "Estética",
+      "categoria": "Imagen personal",
       "items": [
         { "pregunta": "¿Cuál es la capa más externa de la piel?", "opciones": ["Dermis", "Hipodermis", "Epidermis", "Tejido adiposo"], "correcta": "C" },
         { "pregunta": "¿Qué tipo de piel produce exceso de sebo?", "opciones": ["Seca", "Mixta", "Grasa", "Normal"], "correcta": "C" },
@@ -26,28 +26,28 @@
       ]
     },
     {
-      "categoria": "Peluquería",
+      "categoria": "Obra",
       "items": [
-        { "pregunta": "¿Qué herramienta corta cabello?", "opciones": ["Tijeras", "Plancha", "Peine", "Difusor"], "correcta": "A" },
-        { "pregunta": "¿Qué producto fija el peinado?", "opciones": ["Laca", "Champú", "Mascarilla", "Acondicionador"], "correcta": "A" },
-        { "pregunta": "¿Qué técnica aclara el cabello?", "opciones": ["Mechas", "Lavado", "Corte", "Secado"], "correcta": "A" },
-        { "pregunta": "¿Qué aparato seca el cabello?", "opciones": ["Secador", "Plancha", "Tenaza", "Peine"], "correcta": "A" },
-        { "pregunta": "¿Qué producto nutre profundamente?", "opciones": ["Mascarilla", "Gel", "Laca", "Espuma"], "correcta": "A" },
-        { "pregunta": "¿Qué corte es igualado?", "opciones": ["Recto", "Desfilado", "Escalonado", "Degradado"], "correcta": "A" },
-        { "pregunta": "¿Qué técnica cambia el color?", "opciones": ["Tinte", "Cepillado", "Cardado", "Peinado"], "correcta": "A" },
-        { "pregunta": "¿Qué producto limpia el cabello?", "opciones": ["Champú", "Gel", "Laca", "Sérum"], "correcta": "A" },
-        { "pregunta": "¿Qué herramienta desenreda?", "opciones": ["Cepillo", "Plancha", "Tijeras", "Navaja"], "correcta": "A" },
-        { "pregunta": "¿Qué aporta volumen en raíces?", "opciones": ["Cardado", "Alisado", "Lavado", "Corte"], "correcta": "A" },
-        { "pregunta": "¿Qué aparato alisa?", "opciones": ["Plancha", "Secador", "Peine", "Tenaza"], "correcta": "A" },
-        { "pregunta": "¿Qué protege del calor?", "opciones": ["Protector térmico", "Gel", "Laca", "Tinte"], "correcta": "A" },
-        { "pregunta": "¿Qué suaviza tras champú?", "opciones": ["Acondicionador", "Espuma", "Gel", "Laca"], "correcta": "A" },
-        { "pregunta": "¿Qué perfila contornos?", "opciones": ["Máquina eléctrica", "Peine", "Cepillo", "Secador"], "correcta": "A" },
-        { "pregunta": "¿Qué ondula permanente?", "opciones": ["Permanente", "Brushing", "Plancha", "Corte"], "correcta": "A" },
-        { "pregunta": "¿Qué da brillo?", "opciones": ["Sérum", "Champú", "Agua", "Tijeras"], "correcta": "A" },
-        { "pregunta": "¿Qué divide secciones?", "opciones": ["Peine de púa", "Tenaza", "Secador", "Plancha"], "correcta": "A" },
-        { "pregunta": "¿Qué técnica reduce volumen?", "opciones": ["Desfilado", "Cardado", "Moldeado", "Brushing"], "correcta": "A" },
-        { "pregunta": "¿Qué corte es más corto detrás?", "opciones": ["Bob invertido", "Recto", "Rapado", "Clásico"], "correcta": "A" },
-        { "pregunta": "¿Qué riza temporalmente?", "opciones": ["Tenaza", "Decoloración", "Alisado", "Lavado"], "correcta": "A" }
+        { "pregunta": "¿Qué herramienta sirve para verificar la horizontalidad?", "opciones": ["Nivel de burbuja", "Plomada", "Flexómetro", "Escuadra"], "correcta": "A" },
+        { "pregunta": "¿Qué elemento estructural soporta cargas horizontales?", "opciones": ["Viga", "Pilar", "Cimentación", "Tabique"], "correcta": "A" },
+        { "pregunta": "¿Qué material une ladrillos en un muro?", "opciones": ["Mortero", "Hormigón", "Yeso", "Escayola"], "correcta": "A" },
+        { "pregunta": "¿Qué equipo protege la cabeza en la obra?", "opciones": ["Casco", "Arnés", "Guantes", "Botas"], "correcta": "A" },
+        { "pregunta": "¿Qué mezcla contiene cemento, arena, grava y agua?", "opciones": ["Hormigón", "Mortero", "Pasta de yeso", "Lechada"], "correcta": "A" },
+        { "pregunta": "¿Qué herramienta se usa para aplicar mortero?", "opciones": ["Paleta", "Nivel", "Maza", "Cincel"], "correcta": "A" },
+        { "pregunta": "¿Qué técnica comprueba la verticalidad de un muro?", "opciones": ["Uso de plomada", "Regleado", "Nivelación", "Replanteo"], "correcta": "A" },
+        { "pregunta": "¿Qué componente de seguridad evita caídas en altura?", "opciones": ["Arnés", "Mascarilla", "Gafas", "Tapones"], "correcta": "A" },
+        { "pregunta": "¿Qué estructura provisional soporta el hormigón fresco?", "opciones": ["Encofrado", "Andamio", "Zanja", "Forjado"], "correcta": "A" },
+        { "pregunta": "¿Qué proceso marca los planos sobre el terreno?", "opciones": ["Replanteo", "Excavación", "Cimentación", "Desbroce"], "correcta": "A" },
+        { "pregunta": "¿Qué aditivo acelera el endurecimiento del hormigón?", "opciones": ["Acelerante", "Plastificante", "Retardador", "Aireante"], "correcta": "A" },
+        { "pregunta": "¿Qué herramienta corta azulejos con precisión?", "opciones": ["Cortadora manual", "Radial", "Tenazas", "Puntero"], "correcta": "A" },
+        { "pregunta": "¿Qué elemento transmite las cargas al terreno?", "opciones": ["Cimentación", "Cubierta", "Dintel", "Cerramiento"], "correcta": "A" },
+        { "pregunta": "¿Qué revestimiento se aplica directamente al ladrillo?", "opciones": ["Enfoscado", "Pintura", "Papel", "Barniz"], "correcta": "A" },
+        { "pregunta": "¿Qué pieza cierra el hueco superior de una ventana?", "opciones": ["Dintel", "Jamba", "Alféizar", "Montante"], "correcta": "A" },
+        { "pregunta": "¿Qué material se usa para tabiquería ligera?", "opciones": ["Placa de yeso laminado", "Ladrillo macizo", "Hormigón armado", "Piedra"], "correcta": "A" },
+        { "pregunta": "¿Qué máquina eleva materiales pesados verticalmente?", "opciones": ["Grúa torre", "Hormigonera", "Dúmper", "Vibrador"], "correcta": "A" },
+        { "pregunta": "¿Qué técnica elimina el aire del hormigón fresco?", "opciones": ["Vibrado", "Curado", "Fratasado", "Regleado"], "correcta": "A" },
+        { "pregunta": "¿Qué unidad mide la resistencia del hormigón?", "opciones": ["Megapascales (MPa)", "Metros lineales", "Kilogramos", "Grados"], "correcta": "A" },
+        { "pregunta": "¿Qué protección colectiva rodea el perímetro de un forjado?", "opciones": ["Barandilla", "Red de seguridad", "Puntal", "Valla de obra"], "correcta": "A" }
       ]
     },
     {
