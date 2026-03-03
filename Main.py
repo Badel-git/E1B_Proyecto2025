@@ -214,7 +214,7 @@ class OcaGame(arcade.Window):
         self.resultado_quiz = None
         
         # 1. Enlazamos la ficha (0, 1, 2, 3) con la categoría exacta de tu JSON.
-        categorias = ["Peluquería", "Estética", "Informática", "Madera"]
+        categorias = ["Obra", "Imagen personal", "Informática", "Madera"]
         categoria_elegida = categorias[self.jugador_elegido]
 
         # 2. Buscamos el bloque de esa categoría en el JSON y sacamos sus "items"
@@ -389,7 +389,7 @@ class OcaGame(arcade.Window):
         arcade.draw_text("SELECCIONA TU CATEGORÍA", self.width // 2, self.height // 2 + 200,
                          arcade.color.WHITE, 45, anchor_x="center", bold=True)
         
-        nombres = ["OBRA", "ESTÉTICA", "INFORMÁTICA", "MADERA"]
+        nombres = ["OBRA", "IMAGEN PERSONAL", "INFORMÁTICA", "MADERA"]
         for i in range(4):
             cx = self.width // 2 - 300 + (i * 200)
             cy = self.height // 2
@@ -439,7 +439,7 @@ class OcaGame(arcade.Window):
                 
                 arcade.draw_text("TÚ", posX + dx, posY + dy + 45, arcade.color.WHITE, 14, anchor_x="center", bold=True)
 
-        nombres = ["OBRA", "ESTÉTICA", "INFORMÁTICA", "MADERA"]
+        nombres = ["OBRA", "IMAGEN PERSONAL", "INFORMÁTICA", "MADERA"]
         texto = f"Turno: {nombres[self.jugador_elegido]} - Pulsa ESPACIO" 
         arcade.draw_text(texto, self.width // 2, 60, arcade.color.WHITE, 24, anchor_x="center", bold=True)
 
