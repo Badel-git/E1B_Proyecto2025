@@ -12,7 +12,7 @@ os.chdir(file_path)
 
 # --- 2. CONSTANTES ---
 SCREEN_TITLE = "La Oca - Versión Master (F11 para Pantalla Completa)"
-URL_FONDO = "https://i.postimg.cc/Qx0fKVpd/Fondo-Tablero.jpg"
+URL_FONDO = "https://i.postimg.cc/2ywynnLw/Fondo-Nuevo.jpg"
 URL_CASILLA_1 = "https://i.postimg.cc/Sxh5FjWh/bandera.png"
 
 CELL_SIZE = 120
