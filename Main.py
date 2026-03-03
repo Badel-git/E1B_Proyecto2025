@@ -441,7 +441,7 @@ class OcaGame(arcade.Window):
 
         nombres = ["OBRA", "IMAGEN PERSONAL", "INFORMÁTICA", "MADERA"]
         texto = f"Turno: {nombres[self.jugador_elegido]} - Pulsa ESPACIO" 
-        arcade.draw_text(texto, self.width // 2, 60, arcade.color.WHITE, 24, anchor_x="center", bold=True)
+        arcade.draw_text(texto, self.width // 2, 20, arcade.color.WHITE, 24, anchor_x="center", bold=True)
 
         arcade.draw_text(f"Jugador: {self.nombre}", 20, self.height - 40, 
                          arcade.color.WHITE, 22, bold=True)
