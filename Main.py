@@ -29,6 +29,7 @@ PLAYER_IMAGES = [
 ESTADO_MENU = 0                    
 ESTADO_JUEGO = 1                   
 ESTADO_NOMBRE = 2   # Pantalla para escribir el nombre
+ESTADO_ERROR_FATAL = 3 # NUEVO: Pantalla de bloqueo si falla el JSON
 
 class Dado:
     def tirar(self):
@@ -58,6 +59,7 @@ class OcaGame(arcade.Window):
         self.estado = ESTADO_MENU           
         self.jugador_elegido = None         
         self.nombre = ""  # Variable para guardar tu nombre
+        self.tiempo_error = 0.0 # NUEVO: Temporizador para el cierre del juego
         
         self.background = None
         self.usar_imagen_fondo = False
@@ -105,28 +107,28 @@ class OcaGame(arcade.Window):
             if es_fondo: self.background_color = arcade.color.GRAY
 
     def cargar_preguntas_json(self):
-        """Lee el archivo JSON. Mantiene la estructura original de tu código para el filtrado, pero incluye candados de seguridad."""
+        """Lee el archivo JSON. Si falla, activa el bloqueo fatal en pantalla."""
         self.lista_preguntas = []
         ruta_json = os.path.join("assets", "preguntas.json")
 
         if not os.path.exists(ruta_json):
-            print("[INFO] preguntas.json no existe. Activando Modo Oca Clásica.")
+            self.estado = ESTADO_ERROR_FATAL # Activa el bloqueo fatal
             return
 
         try:
             with open(ruta_json, "r", encoding="utf-8") as archivo:
                 datos = json.load(archivo)
-                # Guardamos la estructura cruda del JSON (las categorías enteras) para que tu función activar_pregunta() las filtre luego
+                # Guardamos la estructura cruda del JSON para filtrarlas luego
                 self.lista_preguntas = datos.get("preguntas", [])
                 
             if len(self.lista_preguntas) == 0:
-                print("[INFO] JSON vacío o formato incorrecto. Activando Modo Oca Clásica.")
+                self.estado = ESTADO_ERROR_FATAL # Activa el bloqueo si está vacío
             else:
                 print(f"[OK] Se han cargado {len(self.lista_preguntas)} categorías de preguntas.")
 
         except Exception as e:
-            print(f"[ERROR] Fallo al leer el JSON: {e}. Activando Modo Oca Clásica.")
-            self.lista_preguntas = []
+            print(f"[ERROR] Fallo al leer el JSON: {e}")
+            self.estado = ESTADO_ERROR_FATAL # Activa el bloqueo si hay error de formato
 
     def cargar_ranking(self):
         """Lee el archivo de puntuaciones. Si no existe, devuelve una lista vacía."""
@@ -228,7 +230,7 @@ class OcaGame(arcade.Window):
         if preguntas_de_esta_categoria:
             self.pregunta_actual = random.choice(preguntas_de_esta_categoria)
         else:
-            # Plan de emergencia (nunca debería ocurrir gracias a los candados)
+            # Plan de emergencia (no debería ocurrir gracias al escudo fatal)
             self.pregunta_actual = {
                 "pregunta": f"Error: No se encontraron preguntas para {categoria_elegida}", 
                 "opciones": ["A", "B", "C", "D"], 
@@ -249,6 +251,10 @@ class OcaGame(arcade.Window):
 
     def on_mouse_press(self, x, y, button, modifiers):
         """Detecta los clics del ratón para elegir la ficha en el menú o para responder a las preguntas."""
+        # CANDADO FATAL: Bloqueamos los clics de ratón
+        if self.estado == ESTADO_ERROR_FATAL:
+            return
+
         if self.estado == ESTADO_MENU:
             for i in range(4):
                 cx = self.width // 2 - 300 + (i * 200)
@@ -282,6 +288,10 @@ class OcaGame(arcade.Window):
 
     def on_text(self, text):
         """Captura las teclas que pulsa el usuario para escribir su nombre."""
+        # CANDADO FATAL: Bloqueamos el teclado alfabético
+        if self.estado == ESTADO_ERROR_FATAL:
+            return
+
         if self.estado == ESTADO_NOMBRE:
             if len(self.nombre) < 15: # Límite de 15 caracteres
                 if text.isprintable() and text != '\r':
@@ -289,6 +299,13 @@ class OcaGame(arcade.Window):
 
     def on_update(self, delta_time):
         """Se ejecuta constantemente para actualizar los tiempos."""
+        # --- Lógica de cierre automático por error fatal ---
+        if self.estado == ESTADO_ERROR_FATAL:
+            self.tiempo_error += delta_time
+            if self.tiempo_error >= 10.0:
+                self.close()  # Cierra la ventana a los 10 segundos
+            return  # Ignora el resto del update
+
         if self.resultado_quiz is not None:
             self.tiempo_feedback += delta_time
             if self.tiempo_feedback > 2.0:
@@ -303,6 +320,10 @@ class OcaGame(arcade.Window):
 
     def on_key_press(self, key, modifiers):
         """Detecta las teclas especiales: ENTER, ESPACIO, ESCAPE, F11."""
+        # CANDADO FATAL: Bloqueamos ESC, ESPACIO, ENTER, F11 y todo lo demás
+        if self.estado == ESTADO_ERROR_FATAL:
+            return
+
         if self.estado == ESTADO_NOMBRE:
             if key == arcade.key.ENTER:
                 if self.nombre.strip() == "":
@@ -328,10 +349,12 @@ class OcaGame(arcade.Window):
                 
                 if jugador.casilla_actual < 36:
                     jugador.casilla_actual += pasos
-                #Penalización
+                
+                # Penalización
                 if jugador.casilla_actual in self.casillas_penalizacion:
                     jugador.casilla_actual = max(1, jugador.casilla_actual - 3)
-                #Turbo
+                
+                # Turbo
                 if jugador.casilla_actual in self.casillas_turbo:
                     jugador.casilla_actual = min(36, jugador.casilla_actual + 5)
                 
@@ -351,7 +374,10 @@ class OcaGame(arcade.Window):
         if self.usar_imagen_fondo and self.background:
             arcade.draw_texture_rect(self.background, arcade.XYWH(self.width / 2, self.height / 2, self.width, self.height))
 
-        if self.estado == ESTADO_MENU:
+        # --- Lógica de renderizado por estados ---
+        if self.estado == ESTADO_ERROR_FATAL:
+            self.dibujar_error_fatal()
+        elif self.estado == ESTADO_MENU:
             self.dibujar_menu()            
         elif self.estado == ESTADO_NOMBRE:
             self.dibujar_ingreso_nombre()
@@ -382,6 +408,20 @@ class OcaGame(arcade.Window):
             
             arcade.draw_text(texto_dado, cx, cy - 160, arcade.color.WHITE, 
                             24, anchor_x="center", anchor_y="center", bold=True)
+
+    def dibujar_error_fatal(self):
+        """Dibuja la pantalla de error crítico y la cuenta atrás para el cierre."""
+        arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), arcade.color.BLACK)
+        
+        arcade.draw_text("⚠️ ERROR ⚠️", self.width // 2, self.height // 2 + 100,
+                         arcade.color.RED, 50, anchor_x="center", bold=True)
+                         
+        arcade.draw_text("Avisar al profesor que falta el archivo de preguntas", self.width // 2, self.height // 2,
+                         arcade.color.WHITE, 30, anchor_x="center", bold=True)
+                         
+        segundos_restantes = max(0, 10 - int(self.tiempo_error))
+        arcade.draw_text(f"El juego se cerrará automáticamente en {segundos_restantes}...", self.width // 2, self.height // 2 - 100,
+                         arcade.color.GRAY, 20, anchor_x="center")
 
     def dibujar_menu(self):                
         """Dibuja la pantalla inicial."""
