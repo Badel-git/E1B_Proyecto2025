@@ -56,7 +56,7 @@ Cuando termines, sube tus cambios a la nube:
 > Terminal  
 `git add .`  
 `git commit -m "Descripción breve de lo que hice"`  
-`git push origin "nombre-tarea"`
+`git push origin "nombre de tu rama creada antes"`
 
 4. Unir código (Pull Request)
 Una vez hayas hecho el git push, ve a la página de GitHub.

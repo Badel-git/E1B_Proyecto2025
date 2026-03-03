@@ -12,7 +12,7 @@ os.chdir(file_path)
 
 # --- 2. CONSTANTES ---
 SCREEN_TITLE = "La Oca - Versión Master (F11 para Pantalla Completa)"
-URL_FONDO = "https://i.postimg.cc/2ywynnLw/Fondo-Nuevo.jpg"
+URL_FONDO = "https://i.postimg.cc/Qx0fKVpd/Fondo-Tablero.jpg"
 URL_CASILLA_1 = "https://i.postimg.cc/Sxh5FjWh/bandera.png"
 
 CELL_SIZE = 120
@@ -71,8 +71,6 @@ class OcaGame(arcade.Window):
         self.generar_espiral()
         self.jugadores = [Ficha(i, PLAYER_IMAGES[i]) for i in range(4)]
         self.turno_actual = 0
-        self.casillas_penalizacion = [9, 18, 26]
-        self.casillas_turbo = [5, 14, 22]
 
         # --- PREGUNTAS: Variables de control ---
         self.mostrando_pregunta = False  
@@ -271,11 +269,16 @@ class OcaGame(arcade.Window):
                     if bx < x < bx + bw and by < y < by + bh:
                         if i == idx_correcto:
                             self.resultado_quiz = "CORRECTO"
+                            # --- MODIFICACIÓN DE MOVIMIENTO: Solo si acierta ---
+                            jugador = self.jugadores[self.jugador_elegido]
+                            if jugador.casilla_actual + self.dado_valor_final <= 36:
+                                jugador.casilla_actual += self.dado_valor_final
+                            else:
+                                jugador.casilla_actual = 36
                         else:
                             self.resultado_quiz = "INCORRECTO"
                         return 
             else:
-                # Cierra la ventana si ya respondiste y haces clic
                 self.mostrando_pregunta = False
                 self.tiempo_feedback = 0 
                 self.resultado_quiz = None
@@ -320,23 +323,14 @@ class OcaGame(arcade.Window):
             
         if self.estado == ESTADO_JUEGO and key == arcade.key.SPACE:
             if not self.mostrando_pregunta:
-                jugador = self.jugadores[self.jugador_elegido] 
+                # --- MODIFICACIÓN: Tirar dado pero no mover todavía ---
                 pasos = dado.tirar()
                 self.dado_animacion_activa = True
                 self.dado_timer = 1.5
                 self.dado_valor_final = pasos
                 
-                if jugador.casilla_actual < 36:
-                    jugador.casilla_actual += pasos
-                #Penalización
-                if jugador.casilla_actual in self.casillas_penalizacion:
-                    jugador.casilla_actual = max(1, jugador.casilla_actual - 3)
-                #Turbo
-                if jugador.casilla_actual in self.casillas_turbo:
-                    jugador.casilla_actual = min(36, jugador.casilla_actual + 5)
-                
-                # Lanzar pregunta si se mueve (y si hay preguntas cargadas)
-                if 0 < jugador.casilla_actual < 36:
+                # Lanzar pregunta (el movimiento se hará en on_mouse_press si acierta)
+                if self.jugadores[self.jugador_elegido].casilla_actual < 36:
                     if len(self.lista_preguntas) > 0:
                         self.activar_pregunta()
                     
@@ -418,14 +412,7 @@ class OcaGame(arcade.Window):
             if num == 1 and self.textura_casilla_1:
                 arcade.draw_texture_rect(self.textura_casilla_1, rect_casilla)
             else:
-                if num in self.casillas_penalizacion:
-                    color_fondo = arcade.color.RED
-                elif num in self.casillas_turbo:
-                    color_fondo = arcade.color.BLUE
-                elif num == 36:
-                    color_fondo = arcade.color.ORANGE
-                else:
-                    color_fondo = arcade.color.GREEN
+                color_fondo = arcade.color.GOLD if num % 5 == 0 else (arcade.color.INDIAN_RED if num == 36 else arcade.color.GREEN)
                 arcade.draw_rect_filled(rect_casilla, color_fondo)
             arcade.draw_rect_outline(rect_casilla, arcade.color.BLACK, 2)
             arcade.draw_text(str(num), x + CELL_SIZE/2, y + CELL_SIZE/2, arcade.color.BLACK, 24, anchor_x="center", bold=True)
