@@ -71,6 +71,8 @@ class OcaGame(arcade.Window):
         self.generar_espiral()
         self.jugadores = [Ficha(i, PLAYER_IMAGES[i]) for i in range(4)]
         self.turno_actual = 0
+        self.casillas_penalizacion = [9, 18, 26]
+        self.casillas_turbo = [5, 14, 22]
 
         # --- PREGUNTAS: Variables de control ---
         self.mostrando_pregunta = False  
@@ -326,6 +328,12 @@ class OcaGame(arcade.Window):
                 
                 if jugador.casilla_actual < 36:
                     jugador.casilla_actual += pasos
+                #Penalización
+                if jugador.casilla_actual in self.casillas_penalizacion:
+                    jugador.casilla_actual = max(1, jugador.casilla_actual - 3)
+                #Turbo
+                if jugador.casilla_actual in self.casillas_turbo:
+                    jugador.casilla_actual = min(36, jugador.casilla_actual + 5)
                 
                 # Lanzar pregunta si se mueve (y si hay preguntas cargadas)
                 if 0 < jugador.casilla_actual < 36:
@@ -410,7 +418,14 @@ class OcaGame(arcade.Window):
             if num == 1 and self.textura_casilla_1:
                 arcade.draw_texture_rect(self.textura_casilla_1, rect_casilla)
             else:
-                color_fondo = arcade.color.GOLD if num % 5 == 0 else (arcade.color.INDIAN_RED if num == 36 else arcade.color.GREEN)
+                if num in self.casillas_penalizacion:
+                    color_fondo = arcade.color.RED
+                elif num in self.casillas_turbo:
+                    color_fondo = arcade.color.BLUE
+                elif num == 36:
+                    color_fondo = arcade.color.ORANGE
+                else:
+                    color_fondo = arcade.color.GREEN
                 arcade.draw_rect_filled(rect_casilla, color_fondo)
             arcade.draw_rect_outline(rect_casilla, arcade.color.BLACK, 2)
             arcade.draw_text(str(num), x + CELL_SIZE/2, y + CELL_SIZE/2, arcade.color.BLACK, 24, anchor_x="center", bold=True)
