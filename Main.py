@@ -29,7 +29,7 @@ PLAYER_IMAGES = [
 ESTADO_MENU = 0                    
 ESTADO_JUEGO = 1                   
 ESTADO_NOMBRE = 2   # Pantalla para escribir el nombre
-
+ESTADO_VICTORIA = 3
 class Dado:
     def tirar(self):
         """Genera un número aleatorio entre 1 y 6 para el movimiento."""
@@ -71,6 +71,7 @@ class OcaGame(arcade.Window):
         self.generar_espiral()
         self.jugadores = [Ficha(i, PLAYER_IMAGES[i]) for i in range(4)]
         self.turno_actual = 0
+        self.contador_tiradas = 0
 
         # --- PREGUNTAS: Variables de control ---
         self.mostrando_pregunta = False  
@@ -300,42 +301,44 @@ class OcaGame(arcade.Window):
                 self.dado_animacion_activa = False
 
     def on_key_press(self, key, modifiers):
-        """Detecta las teclas especiales: ENTER, ESPACIO, ESCAPE, F11."""
-        if self.estado == ESTADO_NOMBRE:
-            if key == arcade.key.ENTER:
-                if self.nombre.strip() == "":
-                    self.nombre = "Jugador 1"
+
+    # 🔹 BLOQUEAR TODO EN VICTORIA (TIENE QUE IR PRIMERO)
+        if self.estado == ESTADO_VICTORIA:
+            return
+
+    # 🔹 PASAR DEL NOMBRE AL JUEGO
+        if self.estado == ESTADO_NOMBRE and key == arcade.key.ENTER:
+            if self.nombre.strip() != "":
                 self.estado = ESTADO_JUEGO
-            elif key == arcade.key.BACKSPACE:
-                self.nombre = self.nombre[:-1]
-            return 
-        
-        if key == arcade.key.ESCAPE:
-            self.close()
-        elif key == arcade.key.F11:
-            self.set_fullscreen(not self.fullscreen)
-            self.set_mouse_visible(True)
-            
+
+    # 🔹 JUEGO
         if self.estado == ESTADO_JUEGO and key == arcade.key.SPACE:
             if not self.mostrando_pregunta:
-                jugador = self.jugadores[self.jugador_elegido] 
+                jugador = self.jugadores[self.jugador_elegido]
+
                 pasos = dado.tirar()
+                self.contador_tiradas += 1
+
                 self.dado_animacion_activa = True
                 self.dado_timer = 1.5
                 self.dado_valor_final = pasos
-                
-                if jugador.casilla_actual < 36:
-                    jugador.casilla_actual += pasos
-                
-                # Lanzar pregunta si se mueve (y si hay preguntas cargadas)
-                if 0 < jugador.casilla_actual < 36:
-                    if len(self.lista_preguntas) > 0:
-                        self.activar_pregunta()
-                    
-            elif self.mostrando_pregunta and self.resultado_quiz is not None:
-                self.mostrando_pregunta = False
-                self.tiempo_feedback = 0
-                self.resultado_quiz = None
+
+                jugador.casilla_actual += pasos
+
+                # 🔹 PRIMERO PREGUNTA (como antes)
+                if self.estado == ESTADO_JUEGO:
+                    if 0 < jugador.casilla_actual < 36:
+                        if len(self.lista_preguntas) > 0:
+                            self.activar_pregunta()
+
+                # 🔹 DESPUÉS victoria
+                self.comprobar_victoria()
+
+    # 🔹 CERRAR PREGUNTA
+        elif self.mostrando_pregunta and self.resultado_quiz is not None:
+            self.mostrando_pregunta = False
+            self.tiempo_feedback = 0
+            self.resultado_quiz = None
 
     def on_draw(self):
         """Función principal de dibujado."""
@@ -349,6 +352,17 @@ class OcaGame(arcade.Window):
             self.dibujar_ingreso_nombre()
         elif self.estado == ESTADO_JUEGO:
             self.dibujar_tablero_y_fichas()
+        elif self.estado == ESTADO_VICTORIA:
+            self.dibujar_victoria()
+            arcade.draw_text(
+                "HAS GANADO 🎉",
+                self.width // 2,
+                self.height - 200,
+            arcade.color.GOLD,
+                50,
+                anchor_x="center",
+                bold=True
+            )
         
         if self.mostrando_pregunta and self.pregunta_actual:
             self.dibujar_capa_pregunta()
@@ -473,7 +487,53 @@ class OcaGame(arcade.Window):
             color_res = arcade.color.GREEN if self.resultado_quiz == "CORRECTO" else arcade.color.RED
             
             arcade.draw_text(texto_res, cx, cy + 300, color_res, 40, anchor_x="center", bold=True)
+    
+    def comprobar_victoria(self):
+        jugador = self.jugadores[self.jugador_elegido]
 
+        if jugador.casilla_actual >= 36:
+            jugador.casilla_actual = 36
+            self.estado = ESTADO_VICTORIA
+
+            categorias = ["Peluquería", "Estética", "Informática", "Madera"]
+            categoria = categorias[self.jugador_elegido]
+
+            self.guardar_puntuacion(
+                self.nombre,
+                categoria,
+                self.contador_tiradas
+            )
+
+            y_pos -= 35
+
+    def dibujar_victoria(self):
+        arcade.draw_lbwh_rectangle_filled(
+            0, 0, self.width, self.height, (0, 0, 0, 220)
+        )
+
+        arcade.draw_text(
+            "🏆 TOP 10 🏆",
+            self.width // 2,
+            self.height - 300,
+            arcade.color.WHITE,
+            35,
+            anchor_x="center"
+        )
+
+        top10 = self.obtener_top_10()
+        y_pos = self.height - 360
+
+        for i, jugador in enumerate(top10):
+            texto = f"{i+1}. {jugador['nombre']} - {jugador['tiradas']} tiradas"
+            arcade.draw_text(
+                texto,
+                self.width // 2,
+                y_pos,
+                arcade.color.WHITE,
+                22,
+                anchor_x="center"
+            )
+            y_pos -= 35
 def main():
     """Función de arranque."""
     OcaGame()
