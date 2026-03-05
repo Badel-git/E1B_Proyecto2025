@@ -13,6 +13,7 @@ os.chdir(file_path)
 # --- 2. CONSTANTES ---
 SCREEN_TITLE = "La Oca - Versión Master (F11 para Pantalla Completa)"
 URL_FONDO = "https://i.postimg.cc/2ywynnLw/Fondo-Nuevo.jpg"
+URL_CASILLA_1 = "https://i.postimg.cc/Sxh5FjWh/bandera.png"
 
 CELL_SIZE = 120
 MARGIN = 5
@@ -25,10 +26,11 @@ PLAYER_IMAGES = [
 ]
 
 # --- ESTADOS DEL JUEGO ---
-ESTADO_MENU = 0                    
-ESTADO_JUEGO = 1                   
+ESTADO_MENU = 0                     
+ESTADO_JUEGO = 1                    
 ESTADO_NOMBRE = 2   # Pantalla para escribir el nombre
 ESTADO_ERROR_FATAL = 3 # NUEVO: Pantalla de bloqueo si falla el JSON
+ESTADO_VICTORIA = 4
 
 class Dado:
     def tirar(self):
@@ -64,16 +66,15 @@ class OcaGame(arcade.Window):
         self.usar_imagen_fondo = False
         self.textura_casilla_1 = None 
 
-        self.textura_casilla_1 = arcade.load_texture("assets/img/icons/BotonStart.png")
-        self.textura_casilla_36 = arcade.load_texture("assets/img/icons/BotonFin.png")
-
         print("Cargando recursos... ⚙️")
         self.cargar_textura_ninja(URL_FONDO, "temp_fondo.jpg", es_fondo=True)
+        self.cargar_textura_ninja(URL_CASILLA_1, "temp_c1.png", es_fondo=False)
 
         self.camino = []
         self.generar_espiral()
         self.jugadores = [Ficha(i, PLAYER_IMAGES[i]) for i in range(4)]
         self.turno_actual = 0
+        self.contador_tiradas = 0
         self.casillas_penalizacion = [9, 18, 26]
         self.casillas_turbo = [5, 14, 22]
 
@@ -90,6 +91,9 @@ class OcaGame(arcade.Window):
         self.dado_animacion_activa = False
         self.dado_timer = 0.0
         self.dado_valor_final = 1
+
+        # --- ANIMACIÓN DE VICTORIA ---
+        self.animacion_victoria = 0
 
     def cargar_textura_ninja(self, url, nombre_temp, es_fondo):
         """Descarga una imagen de internet temporalmente para usarla en el juego y luego borra el archivo."""
@@ -119,17 +123,16 @@ class OcaGame(arcade.Window):
         try:
             with open(ruta_json, "r", encoding="utf-8") as archivo:
                 datos = json.load(archivo)
-                # Guardamos la estructura cruda del JSON para filtrarlas luego
                 self.lista_preguntas = datos.get("preguntas", [])
                 
             if len(self.lista_preguntas) == 0:
-                self.estado = ESTADO_ERROR_FATAL # Activa el bloqueo si está vacío
+                self.estado = ESTADO_ERROR_FATAL 
             else:
                 print(f"[OK] Se han cargado {len(self.lista_preguntas)} categorías de preguntas.")
 
         except Exception as e:
             print(f"[ERROR] Fallo al leer el JSON: {e}")
-            self.estado = ESTADO_ERROR_FATAL # Activa el bloqueo si hay error de formato
+            self.estado = ESTADO_ERROR_FATAL 
 
     def cargar_ranking(self):
         """Lee el archivo de puntuaciones. Si no existe, devuelve una lista vacía."""
@@ -156,6 +159,9 @@ class OcaGame(arcade.Window):
         
         ruta_ranking = os.path.join("assets", "ranking.json")
         try:
+            # Nos aseguramos de que la carpeta assets existe
+            if not os.path.exists("assets"):
+                os.makedirs("assets")
             with open(ruta_ranking, "w", encoding="utf-8") as archivo:
                 json.dump(ranking, archivo, indent=4, ensure_ascii=False)
         except Exception as e:
@@ -216,32 +222,26 @@ class OcaGame(arcade.Window):
         self.mostrando_pregunta = True
         self.resultado_quiz = None
         
-        # 1. Enlazamos la ficha (0, 1, 2, 3) con la categoría exacta de tu JSON.
         categorias = ["Obra", "Imagen personal", "Informática", "Madera"]
         categoria_elegida = categorias[self.jugador_elegido]
 
-        # 2. Buscamos el bloque de esa categoría en el JSON y sacamos sus "items"
         preguntas_de_esta_categoria = []
         for bloque in self.lista_preguntas:
             if isinstance(bloque, dict) and bloque.get("categoria", "").lower() == categoria_elegida.lower():
                 preguntas_de_esta_categoria = bloque.get("items", [])
                 break
         
-        # 3. Elegimos una pregunta al azar SOLO de esos "items"
         if preguntas_de_esta_categoria:
             self.pregunta_actual = random.choice(preguntas_de_esta_categoria)
         else:
-            # Plan de emergencia (no debería ocurrir gracias al escudo fatal)
             self.pregunta_actual = {
                 "pregunta": f"Error: No se encontraron preguntas para {categoria_elegida}", 
                 "opciones": ["A", "B", "C", "D"], 
                 "correcta": "A"
             }
         
-        # 4. Generamos las posiciones de los botones
         self.botones_rects = []
-        cx = self.width // 2
-        cy = self.height // 2
+        cx, cy = self.width // 2, self.height // 2
         ancho_btn, alto_btn = 500, 60
         start_y = cy - 20
         
@@ -251,61 +251,41 @@ class OcaGame(arcade.Window):
             self.botones_rects.append((x, y, ancho_btn, alto_btn))
 
     def on_mouse_press(self, x, y, button, modifiers):
-        """Detecta los clics del ratón para elegir la ficha en el menú o para responder a las preguntas."""
-        # CANDADO FATAL: Bloqueamos los clics de ratón
-        if self.estado == ESTADO_ERROR_FATAL:
-            return
+        if self.estado == ESTADO_ERROR_FATAL: return
 
         if self.estado == ESTADO_MENU:
             for i in range(4):
-                cx = self.width // 2 - 300 + (i * 200)
-                cy = self.height // 2
-                # Pitágoras para detectar clic manual
+                cx, cy = self.width // 2 - 300 + (i * 200), self.height // 2
                 distancia = math.sqrt((x - cx)**2 + (y - cy)**2) 
                 if distancia < 80:
                     self.jugador_elegido = i
-                    self.turno_actual = i              
+                    self.turno_actual = i                             
                     self.estado = ESTADO_NOMBRE 
-                    print(f"Elegido: {i}. Pasando a pedir nombre...")
         
         elif self.estado == ESTADO_JUEGO and self.mostrando_pregunta:
             if self.resultado_quiz is None:
                 mapa_letras = {"A": 0, "B": 1, "C": 2, "D": 3}
                 idx_correcto = mapa_letras.get(self.pregunta_actual["correcta"], 0)
-
                 for i, rect in enumerate(self.botones_rects):
                     bx, by, bw, bh = rect
                     if bx < x < bx + bw and by < y < by + bh:
-                        if i == idx_correcto:
-                            self.resultado_quiz = "CORRECTO"
-                        else:
-                            self.resultado_quiz = "INCORRECTO"
+                        self.resultado_quiz = "CORRECTO" if i == idx_correcto else "INCORRECTO"
                         return 
             else:
-                # Cierra la ventana si ya respondiste y haces clic
                 self.mostrando_pregunta = False
                 self.tiempo_feedback = 0 
                 self.resultado_quiz = None
 
     def on_text(self, text):
-        """Captura las teclas que pulsa el usuario para escribir su nombre."""
-        # CANDADO FATAL: Bloqueamos el teclado alfabético
-        if self.estado == ESTADO_ERROR_FATAL:
-            return
-
         if self.estado == ESTADO_NOMBRE:
-            if len(self.nombre) < 15: # Límite de 15 caracteres
-                if text.isprintable() and text != '\r':
-                    self.nombre += text
+            if len(self.nombre) < 15 and text.isprintable() and text != '\r':
+                self.nombre += text
 
     def on_update(self, delta_time):
-        """Se ejecuta constantemente para actualizar los tiempos."""
-        # --- Lógica de cierre automático por error fatal ---
         if self.estado == ESTADO_ERROR_FATAL:
             self.tiempo_error += delta_time
-            if self.tiempo_error >= 10.0:
-                self.close()  # Cierra la ventana a los 10 segundos
-            return  # Ignora el resto del update
+            if self.tiempo_error >= 10.0: self.close()
+            return
 
         if self.resultado_quiz is not None:
             self.tiempo_feedback += delta_time
@@ -314,227 +294,160 @@ class OcaGame(arcade.Window):
                 self.tiempo_feedback = 0
                 self.resultado_quiz = None
 
-        if getattr(self, "dado_animacion_activa", False):
+        if self.dado_animacion_activa:
             self.dado_timer -= delta_time
-        if self.dado_timer <= 0:
-                self.dado_animacion_activa = False
+            if self.dado_timer <= 0: self.dado_animacion_activa = False
+
+        if self.estado == ESTADO_VICTORIA:
+            self.animacion_victoria += delta_time * 3
 
     def on_key_press(self, key, modifiers):
-        """Detecta las teclas especiales: ENTER, ESPACIO, ESCAPE, F11."""
-        # CANDADO FATAL: Bloqueamos ESC, ESPACIO, ENTER, F11 y todo lo demás
-        if self.estado == ESTADO_ERROR_FATAL:
-            return
+        if self.estado == ESTADO_ERROR_FATAL: return
 
+        # --- AÑADIDO: REINICIO DESDE VICTORIA ---
+        if self.estado == ESTADO_VICTORIA: 
+            if key == arcade.key.ENTER:
+                self.estado = ESTADO_MENU
+                self.nombre = ""
+                self.contador_tiradas = 0
+                for f in self.jugadores: f.casilla_actual = 0
+            return
+        
         if self.estado == ESTADO_NOMBRE:
             if key == arcade.key.ENTER:
-                if self.nombre.strip() == "":
-                    self.nombre = "Jugador 1"
+                if not self.nombre.strip(): self.nombre = "Jugador 1"
                 self.estado = ESTADO_JUEGO
-            elif key == arcade.key.BACKSPACE:
-                self.nombre = self.nombre[:-1]
+            elif key == arcade.key.BACKSPACE: self.nombre = self.nombre[:-1]
             return 
         
-        if key == arcade.key.ESCAPE:
-            self.close()
-        elif key == arcade.key.F11:
-            self.set_fullscreen(not self.fullscreen)
-            self.set_mouse_visible(True)
+        if key == arcade.key.ESCAPE: self.close()
+        elif key == arcade.key.F11: self.set_fullscreen(not self.fullscreen)
             
-        if self.estado == ESTADO_JUEGO and key == arcade.key.SPACE:
-            if not self.mostrando_pregunta:
-                jugador = self.jugadores[self.jugador_elegido] 
-                pasos = dado.tirar()
-                self.dado_animacion_activa = True
-                self.dado_timer = 1.5
-                self.dado_valor_final = pasos
-                
-                if jugador.casilla_actual < 36:
-                    jugador.casilla_actual += pasos
-                
-                # Penalización
-                if jugador.casilla_actual in self.casillas_penalizacion:
-                    jugador.casilla_actual = max(1, jugador.casilla_actual - 3)
-                
-                # Turbo
-                if jugador.casilla_actual in self.casillas_turbo:
-                    jugador.casilla_actual = min(36, jugador.casilla_actual + 5)
-                
-                # Lanzar pregunta si se mueve (y si hay preguntas cargadas)
-                if 0 < jugador.casilla_actual < 36:
-                    if len(self.lista_preguntas) > 0:
-                        self.activar_pregunta()
-                    
-            elif self.mostrando_pregunta and self.resultado_quiz is not None:
-                self.mostrando_pregunta = False
-                self.tiempo_feedback = 0
-                self.resultado_quiz = None
+        if self.estado == ESTADO_JUEGO and key == arcade.key.SPACE and not self.mostrando_pregunta:
+            jugador = self.jugadores[self.jugador_elegido] 
+            pasos = dado.tirar()
+            self.contador_tiradas += 1
+            self.dado_animacion_activa, self.dado_timer, self.dado_valor_final = True, 1.5, pasos
+            
+            jugador.casilla_actual += pasos
+            
+            # --- CORRECCIÓN CLAVE: LLEGADA A META ---
+            if jugador.casilla_actual >= 36:
+                jugador.casilla_actual = 36
+                self.comprobar_victoria()
+                return # IMPORTANTE: Detener ejecución aquí para que se pinte la victoria
+
+            # Penalización / Turbo (Solo si no ha ganado ya)
+            if jugador.casilla_actual in self.casillas_penalizacion:
+                jugador.casilla_actual = max(1, jugador.casilla_actual - 3)
+            elif jugador.casilla_actual in self.casillas_turbo:
+                jugador.casilla_actual = min(36, jugador.casilla_actual + 5)
+                if jugador.casilla_actual == 36:
+                    self.comprobar_victoria()
+                    return
+
+            # Pregunta
+            if 0 < jugador.casilla_actual < 36 and len(self.lista_preguntas) > 0:
+                self.activar_pregunta()
 
     def on_draw(self):
-        """Función principal de dibujado."""
         self.clear()
         if self.usar_imagen_fondo and self.background:
             arcade.draw_texture_rect(self.background, arcade.XYWH(self.width / 2, self.height / 2, self.width, self.height))
 
-        # --- Lógica de renderizado por estados ---
-        if self.estado == ESTADO_ERROR_FATAL:
-            self.dibujar_error_fatal()
-        elif self.estado == ESTADO_MENU:
-            self.dibujar_menu()            
-        elif self.estado == ESTADO_NOMBRE:
-            self.dibujar_ingreso_nombre()
+        if self.estado == ESTADO_ERROR_FATAL: self.dibujar_error_fatal()
+        elif self.estado == ESTADO_MENU: self.dibujar_menu()            
+        elif self.estado == ESTADO_NOMBRE: self.dibujar_ingreso_nombre()
         elif self.estado == ESTADO_JUEGO:
             self.dibujar_tablero_y_fichas()
-        
-        if self.mostrando_pregunta and self.pregunta_actual:
-            self.dibujar_capa_pregunta()
-            
-        if getattr(self, "dado_animacion_activa", False):
-            cx = self.width // 4
-            cy = self.height // 2
-            
-            arcade.draw_rect_filled(arcade.XYWH(cx, cy, 250, 250), (0, 0, 0, 220))
-            arcade.draw_rect_outline(arcade.XYWH(cx, cy, 250, 250), arcade.color.WHITE, 5)
-            
-            if self.dado_timer > 0.5:
-                valor_mostrar = random.randint(1, 6)
-                texto_dado = "TIRANDO..."
-                color_texto = arcade.color.WHITE
-            else:
-                valor_mostrar = self.dado_valor_final
-                texto_dado = "¡RESULTADO!"
-                color_texto = arcade.color.GOLD
-                
-            arcade.draw_text(str(valor_mostrar), cx, cy - 20, color_texto, 
-                            120, anchor_x="center", anchor_y="center", bold=True)
-            
-            arcade.draw_text(texto_dado, cx, cy - 160, arcade.color.WHITE, 
-                            24, anchor_x="center", anchor_y="center", bold=True)
+            if self.mostrando_pregunta and self.pregunta_actual: self.dibujar_capa_pregunta()
+            if self.dado_animacion_activa: self.dibujar_dado_visual()
+        elif self.estado == ESTADO_VICTORIA:
+            self.dibujar_victoria()
+
+    def dibujar_dado_visual(self):
+        cx, cy = self.width // 4, self.height // 2
+        arcade.draw_rect_filled(arcade.XYWH(cx, cy, 250, 250), (0, 0, 0, 220))
+        arcade.draw_rect_outline(arcade.XYWH(cx, cy, 250, 250), arcade.color.WHITE, 5)
+        v = random.randint(1, 6) if self.dado_timer > 0.5 else self.dado_valor_final
+        txt, col = ("TIRANDO...", arcade.color.WHITE) if self.dado_timer > 0.5 else ("¡RESULTADO!", arcade.color.GOLD)
+        arcade.draw_text(str(v), cx, cy - 20, col, 120, anchor_x="center", anchor_y="center", bold=True)
+        arcade.draw_text(txt, cx, cy - 160, arcade.color.WHITE, 24, anchor_x="center", anchor_y="center", bold=True)
 
     def dibujar_error_fatal(self):
-        """Dibuja la pantalla de error crítico y la cuenta atrás para el cierre."""
         arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), arcade.color.BLACK)
-        
-        arcade.draw_text("⚠️ ERROR ⚠️", self.width // 2, self.height // 2 + 100,
-                         arcade.color.RED, 50, anchor_x="center", bold=True)
-                         
-        arcade.draw_text("Avisar al profesor que falta el archivo de preguntas", self.width // 2, self.height // 2,
-                         arcade.color.WHITE, 30, anchor_x="center", bold=True)
-                         
-        segundos_restantes = max(0, 10 - int(self.tiempo_error))
-        arcade.draw_text(f"El juego se cerrará automáticamente en {segundos_restantes}...", self.width // 2, self.height // 2 - 100,
-                         arcade.color.GRAY, 20, anchor_x="center")
+        arcade.draw_text("⚠️ ERROR ⚠️", self.width // 2, self.height // 2 + 100, arcade.color.RED, 50, anchor_x="center", bold=True)
+        arcade.draw_text("Falta el archivo de preguntas", self.width // 2, self.height // 2, arcade.color.WHITE, 30, anchor_x="center", bold=True)
 
     def dibujar_menu(self):                
-        """Dibuja la pantalla inicial."""
         arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), (0, 0, 0, 150))
-        arcade.draw_text("SELECCIONA TU CATEGORÍA", self.width // 2, self.height // 2 + 200,
-                         arcade.color.WHITE, 45, anchor_x="center", bold=True)
-        
+        arcade.draw_text("SELECCIONA TU CATEGORÍA", self.width // 2, self.height // 2 + 200, arcade.color.WHITE, 45, anchor_x="center", bold=True)
         nombres = ["OBRA", "IMAGEN PERSONAL", "INFORMÁTICA", "MADERA"]
         for i in range(4):
-            cx = self.width // 2 - 300 + (i * 200)
-            cy = self.height // 2
-            if self.jugadores[i].texture:
-                arcade.draw_texture_rect(self.jugadores[i].texture, arcade.XYWH(cx, cy, 120, 120))
+            cx, cy = self.width // 2 - 300 + (i * 200), self.height // 2
+            if self.jugadores[i].texture: arcade.draw_texture_rect(self.jugadores[i].texture, arcade.XYWH(cx, cy, 120, 120))
             arcade.draw_text(nombres[i], cx, cy - 100, arcade.color.WHITE, 18, anchor_x="center", bold=True)
 
     def dibujar_ingreso_nombre(self):
-        """Dibuja la pantalla donde el jugador escribe su nombre."""
         arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), (0, 0, 0, 180))
-        arcade.draw_text("INTRODUCE TU NOMBRE:", self.width // 2, self.height // 2 + 50,
-                         arcade.color.WHITE, 35, anchor_x="center", bold=True)
-        
-        arcade.draw_text(self.nombre + "_", self.width // 2, self.height // 2 - 20,
-                         arcade.color.GOLD, 45, anchor_x="center", bold=True)
-        
-        arcade.draw_text("Pulsa ENTER para comenzar", self.width // 2, self.height // 2 - 100,
-                         arcade.color.GRAY, 20, anchor_x="center")
+        arcade.draw_text("INTRODUCE TU NOMBRE:", self.width // 2, self.height // 2 + 50, arcade.color.WHITE, 35, anchor_x="center", bold=True)
+        arcade.draw_text(self.nombre + "_", self.width // 2, self.height // 2 - 20, arcade.color.GOLD, 45, anchor_x="center", bold=True)
 
     def dibujar_tablero_y_fichas(self):
-        """Dibuja las casillas y la ficha del jugador."""
         off_x, off_y = self.obtener_offsets()
         for col, fila, num in self.camino:
             x, y = off_x + col * (CELL_SIZE + MARGIN), off_y - fila * (CELL_SIZE + MARGIN)
-            rect_casilla = arcade.LBWH(x, y, CELL_SIZE, CELL_SIZE)
-            if num == 1 and self.textura_casilla_1:
-                arcade.draw_texture_rect(self.textura_casilla_1, rect_casilla)
-            elif num == 36 and self.textura_casilla_36:
-                arcade.draw_texture_rect(self.textura_casilla_36, rect_casilla)
+            rect = arcade.LBWH(x, y, CELL_SIZE, CELL_SIZE)
+            if num == 1 and self.textura_casilla_1: arcade.draw_texture_rect(self.textura_casilla_1, rect)
             else:
-                if num in self.casillas_penalizacion:
-                    color_fondo = arcade.color.RED
-                elif num in self.casillas_turbo:
-                    color_fondo = arcade.color.BLUE
-                elif num == 36:
-                    color_fondo = arcade.color.ORANGE
-                else:
-                    color_fondo = arcade.color.GREEN
-                arcade.draw_rect_filled(rect_casilla, color_fondo)
-            arcade.draw_rect_outline(rect_casilla, arcade.color.BLACK, 2)
-            if num not in (1, 36):
-                arcade.draw_text(str(num), x + CELL_SIZE/2, y + CELL_SIZE/2, arcade.color.BLACK, 24, anchor_x="center", bold=True)
+                c = arcade.color.RED if num in self.casillas_penalizacion else arcade.color.BLUE if num in self.casillas_turbo else arcade.color.ORANGE if num == 36 else arcade.color.GREEN
+                arcade.draw_rect_filled(rect, c)
+            arcade.draw_rect_outline(rect, arcade.color.BLACK, 2)
+            arcade.draw_text(str(num), x + CELL_SIZE/2, y + CELL_SIZE/2, arcade.color.BLACK, 24, anchor_x="center", bold=True)
 
-        for i, jugador in enumerate(self.jugadores):
-            if i == self.jugador_elegido: 
-                posX, posY = self.obtener_coordenadas_casilla(jugador.casilla_actual)
-                dx, dy = 0, 0 
-                if jugador.texture:
-                    arcade.draw_texture_rect(jugador.texture, arcade.XYWH(posX + dx, posY + dy, 60, 60))
-                
-                arcade.draw_text("TÚ", posX + dx, posY + dy + 45, arcade.color.WHITE, 14, anchor_x="center", bold=True)
-
-        nombres = ["OBRA", "IMAGEN PERSONAL", "INFORMÁTICA", "MADERA"]
-        texto = f"Turno: {nombres[self.jugador_elegido]} - Pulsa ESPACIO" 
-        arcade.draw_text(texto, self.width // 2, 20, arcade.color.WHITE, 24, anchor_x="center", bold=True)
-
-        arcade.draw_text(f"Jugador: {self.nombre}", 20, self.height - 40, 
-                         arcade.color.WHITE, 22, bold=True)
+        j = self.jugadores[self.jugador_elegido]
+        posX, posY = self.obtener_coordenadas_casilla(j.casilla_actual)
+        if j.texture: arcade.draw_texture_rect(j.texture, arcade.XYWH(posX, posY, 60, 60))
+        arcade.draw_text(f"Jugador: {self.nombre}", 20, self.height - 40, arcade.color.WHITE, 22, bold=True)
 
     def dibujar_capa_pregunta(self):
-        """Oscurece el fondo y dibuja la interfaz de preguntas."""
         arcade.draw_lbwh_rectangle_filled(0, 0, self.width, self.height, (0, 0, 0, 230))
-        cx = self.width // 2
-        cy = self.height // 2
-
-        arcade.draw_text(
-            self.pregunta_actual["pregunta"], cx, cy + 150, arcade.color.WHITE,
-            30, anchor_x="center", anchor_y="center", width=900, align="center", multiline=True, bold=True
-        )
-
+        cx, cy = self.width // 2, self.height // 2
+        arcade.draw_text(self.pregunta_actual["pregunta"], cx, cy + 150, arcade.color.WHITE, 30, anchor_x="center", anchor_y="center", width=900, align="center", multiline=True, bold=True)
         letras = ["A", "B", "C", "D"]
-        colores_base = [arcade.color.BLUE, arcade.color.RED, arcade.color.AMBER, arcade.color.GREEN]
-        mapa_letras = {"A": 0, "B": 1, "C": 2, "D": 3}
-        idx_correcto = mapa_letras.get(self.pregunta_actual["correcta"], 0)
-
+        colores = [arcade.color.BLUE, arcade.color.RED, arcade.color.AMBER, arcade.color.GREEN]
+        idx_corr = {"A": 0, "B": 1, "C": 2, "D": 3}.get(self.pregunta_actual["correcta"], 0)
         for i, rect in enumerate(self.botones_rects):
             x, y, w, h = rect
-            color_btn = colores_base[i]
-            
-            if self.resultado_quiz is not None:
-                if i == idx_correcto:
-                    color_btn = arcade.color.GOLD  
-                else:
-                    color_btn = arcade.color.GRAY  
-            
-            arcade.draw_lbwh_rectangle_filled(x, y, w, h, color_btn)
-            arcade.draw_lbwh_rectangle_outline(x, y, w, h, arcade.color.WHITE, 3)
-            
-            if color_btn in (arcade.color.GOLD, arcade.color.AMBER, arcade.color.GREEN, arcade.color.YELLOW):
-                color_texto = arcade.color.BLACK
-            else:
-                color_texto = arcade.color.WHITE
-
-            texto_op = f"{letras[i]}) {self.pregunta_actual['opciones'][i]}"
-            arcade.draw_text(texto_op, x + w / 2, y + h / 2, color_texto, 18, anchor_x="center", anchor_y="center")
-
+            c_btn = colores[i]
+            if self.resultado_quiz: c_btn = arcade.color.GOLD if i == idx_corr else arcade.color.GRAY
+            arcade.draw_lbwh_rectangle_filled(x, y, w, h, c_btn)
+            arcade.draw_text(f"{letras[i]}) {self.pregunta_actual['opciones'][i]}", x + w/2, y + h/2, arcade.color.WHITE, 18, anchor_x="center", anchor_y="center")
         if self.resultado_quiz:
-            texto_res = "¡CORRECTO!" if self.resultado_quiz == "CORRECTO" else "¡FALLASTE!"
-            color_res = arcade.color.GREEN if self.resultado_quiz == "CORRECTO" else arcade.color.RED
-            
-            arcade.draw_text(texto_res, cx, cy + 300, color_res, 40, anchor_x="center", bold=True)
+            txt, col = ("¡CORRECTO!", arcade.color.GREEN) if self.resultado_quiz == "CORRECTO" else ("¡FALLASTE!", arcade.color.RED)
+            arcade.draw_text(txt, cx, cy + 300, col, 40, anchor_x="center", bold=True)
+
+    def comprobar_victoria(self):
+        self.estado = ESTADO_VICTORIA
+        self.mostrando_pregunta = False
+        categorias = ["Obra", "Imagen personal", "Informática", "Madera"]
+        self.guardar_puntuacion(self.nombre, categorias[self.jugador_elegido], self.contador_tiradas)
+
+    def dibujar_victoria(self):
+        arcade.draw_lbwh_rectangle_filled(0, 0, self.width, self.height, (0, 0, 0, 240))
+        escala = 50 + math.sin(self.animacion_victoria) * 5
+        arcade.draw_text("🎉 ¡HAS GANADO! 🎉", self.width // 2, self.height - 150, arcade.color.GOLD, escala, anchor_x="center", bold=True)
+        arcade.draw_text(f"{self.nombre} terminó en {self.contador_tiradas} tiradas", self.width // 2, self.height - 230, arcade.color.WHITE, 24, anchor_x="center")
+        arcade.draw_text("🏆 TOP 10 JUGADORES 🏆", self.width // 2, self.height - 320, arcade.color.WHITE, 35, anchor_x="center")
+        top10, y = self.obtener_top_10(), self.height - 380
+        medallas = ["🥇", "🥈", "🥉"]
+        for i, jug in enumerate(top10):
+            pref = medallas[i] if i < 3 else f"{i+1}."
+            arcade.draw_text(f"{pref} {jug['nombre']} - {jug['tiradas']} tiradas", self.width // 2, y, arcade.color.WHITE, 22, anchor_x="center")
+            y -= 35
+        arcade.draw_text("Pulsa ENTER para volver al menú principal", self.width // 2, 80, arcade.color.GRAY, 18, anchor_x="center")
 
 def main():
-    """Función de arranque."""
     OcaGame()
     arcade.run()
 
