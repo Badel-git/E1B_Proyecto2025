@@ -13,7 +13,6 @@ os.chdir(file_path)
 # --- 2. CONSTANTES ---
 SCREEN_TITLE = "La Oca - Versión Master (F11 para Pantalla Completa)"
 URL_FONDO = "https://i.postimg.cc/2ywynnLw/Fondo-Nuevo.jpg"
-URL_CASILLA_1 = "https://i.postimg.cc/Sxh5FjWh/bandera.png"
 
 CELL_SIZE = 120
 MARGIN = 5
@@ -65,9 +64,11 @@ class OcaGame(arcade.Window):
         self.usar_imagen_fondo = False
         self.textura_casilla_1 = None 
 
+        self.textura_casilla_1 = arcade.load_texture("assets/img/icons/BotonStart.png")
+        self.textura_casilla_36 = arcade.load_texture("assets/img/icons/BotonFin.png")
+
         print("Cargando recursos... ⚙️")
         self.cargar_textura_ninja(URL_FONDO, "temp_fondo.jpg", es_fondo=True)
-        self.cargar_textura_ninja(URL_CASILLA_1, "temp_c1.png", es_fondo=False)
 
         self.camino = []
         self.generar_espiral()
@@ -457,6 +458,8 @@ class OcaGame(arcade.Window):
             rect_casilla = arcade.LBWH(x, y, CELL_SIZE, CELL_SIZE)
             if num == 1 and self.textura_casilla_1:
                 arcade.draw_texture_rect(self.textura_casilla_1, rect_casilla)
+            elif num == 36 and self.textura_casilla_36:
+                arcade.draw_texture_rect(self.textura_casilla_36, rect_casilla)
             else:
                 if num in self.casillas_penalizacion:
                     color_fondo = arcade.color.RED
@@ -468,7 +471,8 @@ class OcaGame(arcade.Window):
                     color_fondo = arcade.color.GREEN
                 arcade.draw_rect_filled(rect_casilla, color_fondo)
             arcade.draw_rect_outline(rect_casilla, arcade.color.BLACK, 2)
-            arcade.draw_text(str(num), x + CELL_SIZE/2, y + CELL_SIZE/2, arcade.color.BLACK, 24, anchor_x="center", bold=True)
+            if num not in (1, 36):
+                arcade.draw_text(str(num), x + CELL_SIZE/2, y + CELL_SIZE/2, arcade.color.BLACK, 24, anchor_x="center", bold=True)
 
         for i, jugador in enumerate(self.jugadores):
             if i == self.jugador_elegido: 
