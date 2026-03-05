@@ -69,6 +69,14 @@ class OcaGame(arcade.Window):
 
         print("Cargando recursos... ⚙️")
         self.cargar_textura_ninja(URL_FONDO, "temp_fondo.jpg", es_fondo=True)
+        self.texturas_dado = []
+        for i in range(1, 7):
+            ruta_dado = f"assets/img/Dados/cara{i}.png"
+            try:
+                textura = arcade.load_texture(ruta_dado)
+                self.texturas_dado.append(textura)
+            except Exception as e:
+                print(f"Error cargando imagen del dado {i}: {e}")
 
         self.camino = []
         self.generar_espiral()
@@ -389,26 +397,36 @@ class OcaGame(arcade.Window):
             self.dibujar_capa_pregunta()
             
         if getattr(self, "dado_animacion_activa", False):
-            cx = self.width // 4
-            cy = self.height // 2
-            
-            arcade.draw_rect_filled(arcade.XYWH(cx, cy, 250, 250), (0, 0, 0, 220))
-            arcade.draw_rect_outline(arcade.XYWH(cx, cy, 250, 250), arcade.color.WHITE, 5)
-            
-            if self.dado_timer > 0.5:
-                valor_mostrar = random.randint(1, 6)
-                texto_dado = "TIRANDO..."
-                color_texto = arcade.color.WHITE
-            else:
-                valor_mostrar = self.dado_valor_final
-                texto_dado = "¡RESULTADO!"
-                color_texto = arcade.color.GOLD
-                
-            arcade.draw_text(str(valor_mostrar), cx, cy - 20, color_texto, 
-                            120, anchor_x="center", anchor_y="center", bold=True)
-            
-            arcade.draw_text(texto_dado, cx, cy - 160, arcade.color.WHITE, 
-                            24, anchor_x="center", anchor_y="center", bold=True)
+                    cx = self.width // 4
+                    cy = self.height // 2
+                    
+                    # Fondo oscuro para el dado
+                    arcade.draw_rect_filled(arcade.XYWH(cx, cy, 250, 250), (0, 0, 0, 220))
+                    arcade.draw_rect_outline(arcade.XYWH(cx, cy, 250, 250), arcade.color.WHITE, 5)
+                    
+                    if self.dado_timer > 0.5:
+                        valor_mostrar = random.randint(1, 6)
+                        texto_dado = "TIRANDO..."
+                        color_texto = arcade.color.WHITE
+                    else:
+                        valor_mostrar = self.dado_valor_final
+                        texto_dado = "¡RESULTADO!"
+                        color_texto = arcade.color.GOLD
+                        
+                    # --- NUEVO: DIBUJAR LA IMAGEN EN LUGAR DEL NÚMERO ---
+                    if len(self.texturas_dado) == 6:
+                        # Obtenemos la textura correspondiente (restamos 1 porque la lista empieza en 0)
+                        textura_actual = self.texturas_dado[valor_mostrar - 1]
+                        # Dibujamos la imagen a un tamaño de 150x150 píxeles
+                        arcade.draw_texture_rect(textura_actual, arcade.XYWH(cx, cy, 150, 150))
+                    else:
+                        # Sistema de seguridad: si alguna imagen no carga, dibuja el número de siempre
+                        arcade.draw_text(str(valor_mostrar), cx, cy - 20, color_texto, 
+                                        120, anchor_x="center", anchor_y="center", bold=True)
+                    
+                    # Dibujar el texto ("TIRANDO..." o "¡RESULTADO!")
+                    arcade.draw_text(texto_dado, cx, cy - 160, arcade.color.WHITE, 
+                                    24, anchor_x="center", anchor_y="center", bold=True)
 
     def dibujar_error_fatal(self):
         """Dibuja la pantalla de error crítico y la cuenta atrás para el cierre."""
