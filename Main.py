@@ -29,6 +29,7 @@ ESTADO_MENU = 0
 ESTADO_JUEGO = 1                   
 ESTADO_NOMBRE = 2   # Pantalla para escribir el nombre
 ESTADO_ERROR_FATAL = 3 # NUEVO: Pantalla de bloqueo si falla el JSON
+ESTADO_VICTORIA = 4
 
 class Dado:
     def tirar(self):
@@ -59,6 +60,8 @@ class OcaGame(arcade.Window):
         self.jugador_elegido = None         
         self.nombre = ""  # Variable para guardar tu nombre
         self.tiempo_error = 0.0 # NUEVO: Temporizador para el cierre del juego
+        self.contador_tiradas = 0  # Para el ranking
+        self.animacion_victoria = 0.0 # Para que el texto de victoria se mueva
         
         self.background = None
         self.usar_imagen_fondo = False
@@ -286,16 +289,21 @@ class OcaGame(arcade.Window):
                     if bx < x < bx + bw and by < y < by + bh:
                         if i == idx_correcto:
                             self.resultado_quiz = "CORRECTO"
+                            self.contador_tiradas += 1 # Sumamos la tirada
                             
-                            # --- CAMBIO: LÓGICA DE MOVIMIENTO CONDICIONAL ---
                             jugador = self.jugadores[self.jugador_elegido]
-                            # Avanzamos solo si acertó, usando el valor guardado del dado
-                            if jugador.casilla_actual + self.dado_valor_final <= 36:
-                                jugador.casilla_actual += self.dado_valor_final
+                            
+                            # Si al sumar el dado llegamos o pasamos de 36
+                            if jugador.casilla_actual + self.dado_valor_final >= 36:
+                                jugador.casilla_actual = 36
+                                # GUARDAR Y CAMBIAR A VICTORIA
+                                categorias = ["Obra", "Imagen personal", "Informática", "Madera"]
+                                self.guardar_puntuacion(self.nombre, categorias[self.jugador_elegido], self.contador_tiradas)
+                                self.estado = ESTADO_VICTORIA 
                             else:
-                                jugador.casilla_actual = 36 # Tope en la meta
-                                
-                            # Penalizaciones y Turbo tras el movimiento
+                                jugador.casilla_actual += self.dado_valor_final
+
+                            # Penalizaciones y Turbo
                             if jugador.casilla_actual in self.casillas_penalizacion:
                                 jugador.casilla_actual = max(1, jugador.casilla_actual - 3)
                             if jugador.casilla_actual in self.casillas_turbo:
@@ -342,6 +350,9 @@ class OcaGame(arcade.Window):
         if self.dado_timer <= 0:
                 self.dado_animacion_activa = False
 
+        if self.estado == ESTADO_VICTORIA:
+            self.animacion_victoria += delta_time
+
     def on_key_press(self, key, modifiers):
         """Detecta las teclas especiales: ENTER, ESPACIO, ESCAPE, F11."""
         # CANDADO FATAL: Bloqueamos ESC, ESPACIO, ENTER, F11 y todo lo demás
@@ -381,6 +392,12 @@ class OcaGame(arcade.Window):
                 self.tiempo_feedback = 0
                 self.resultado_quiz = None
 
+            if self.estado == ESTADO_VICTORIA and key == arcade.key.ENTER:
+                self.estado = ESTADO_MENU
+                self.contador_tiradas = 0
+                for j in self.jugadores: 
+                    j.casilla_actual = 0
+
     def on_draw(self):
         """Función principal de dibujado."""
         self.clear()
@@ -396,6 +413,8 @@ class OcaGame(arcade.Window):
             self.dibujar_ingreso_nombre()
         elif self.estado == ESTADO_JUEGO:
             self.dibujar_tablero_y_fichas()
+        elif self.estado == ESTADO_VICTORIA:
+            self.dibujar_victoria()
         
         if self.mostrando_pregunta and self.pregunta_actual:
             self.dibujar_capa_pregunta()
@@ -548,6 +567,23 @@ class OcaGame(arcade.Window):
             color_res = arcade.color.GREEN if self.resultado_quiz == "CORRECTO" else arcade.color.RED
             
             arcade.draw_text(texto_res, cx, cy + 300, color_res, 40, anchor_x="center", bold=True)
+
+    
+    def dibujar_victoria(self):
+        arcade.draw_lbwh_rectangle_filled(0, 0, self.width, self.height, (0, 0, 0, 230))
+        escala = 50 + math.sin(self.animacion_victoria) * 5
+        arcade.draw_text("🎉 ¡HAS GANADO! 🎉", self.width // 2, self.height - 150, arcade.color.GOLD, escala, anchor_x="center", bold=True)
+        arcade.draw_text(f"{self.nombre} terminó en {self.contador_tiradas} tiradas", self.width // 2, self.height - 230, arcade.color.WHITE, 24, anchor_x="center")
+        arcade.draw_text("🏆 TOP 10 JUGADORES 🏆", self.width // 2, self.height - 320, arcade.color.WHITE, 35, anchor_x="center")
+        top10 = self.obtener_top_10()
+        y = self.height - 380
+        medallas = ["🥇", "🥈", "🥉"]
+        for i, jugador in enumerate(top10):
+            prefijo = medallas[i] if i < 3 else f"{i+1}."
+            texto = f"{prefijo} {jugador['nombre']} - {jugador['tiradas']} tiradas"
+            arcade.draw_text(texto, self.width // 2, y, arcade.color.WHITE, 22, anchor_x="center")
+            y -= 35
+        arcade.draw_text("Pulsa ENTER para volver al menú", self.width // 2, 100, arcade.color.GRAY, 20, anchor_x="center")
 
 def main():
     """Función de arranque."""
