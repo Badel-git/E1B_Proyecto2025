@@ -136,7 +136,7 @@ class OcaGame(arcade.Window):
                 print(f"[OK] Se han cargado {len(self.lista_preguntas)} categorías de preguntas.")
 
         except Exception as e:
-            print(f"[ERROR] Fallo al leer el JSON: {e}. Activando Modo Oca Clásica.")
+            print(f"[ERROR] Fallo al leer el JSON: {e}")
             self.estado = ESTADO_ERROR_FATAL # Activa el bloqueo si hay error de formato
 
     def cargar_ranking(self):
@@ -286,23 +286,8 @@ class OcaGame(arcade.Window):
                     if bx < x < bx + bw and by < y < by + bh:
                         if i == idx_correcto:
                             self.resultado_quiz = "CORRECTO"
-                            
-                            # --- CAMBIO: LÓGICA DE MOVIMIENTO CONDICIONAL ---
-                            jugador = self.jugadores[self.jugador_elegido]
-                            # Avanzamos solo si acertó, usando el valor guardado del dado
-                            if jugador.casilla_actual + self.dado_valor_final <= 36:
-                                jugador.casilla_actual += self.dado_valor_final
-                            else:
-                                jugador.casilla_actual = 36 # Tope en la meta
-                                
-                            # Penalizaciones y Turbo tras el movimiento
-                            if jugador.casilla_actual in self.casillas_penalizacion:
-                                jugador.casilla_actual = max(1, jugador.casilla_actual - 3)
-                            if jugador.casilla_actual in self.casillas_turbo:
-                                jugador.casilla_actual = min(36, jugador.casilla_actual + 5)
                         else:
                             self.resultado_quiz = "INCORRECTO"
-                            # Si es incorrecto, no sumamos nada (se queda donde está)
                         return 
             else:
                 # Cierra la ventana si ya respondiste y haces clic
@@ -365,14 +350,25 @@ class OcaGame(arcade.Window):
             
         if self.estado == ESTADO_JUEGO and key == arcade.key.SPACE:
             if not self.mostrando_pregunta:
-                # --- CAMBIO: LANZAR DADO PERO NO MOVER TODAVÍA ---
+                jugador = self.jugadores[self.jugador_elegido] 
                 pasos = dado.tirar()
                 self.dado_animacion_activa = True
                 self.dado_timer = 5.5
-                self.dado_valor_final = pasos # Guardamos el valor para aplicarlo si acierta
+                self.dado_valor_final = pasos
                 
-                # Lanzar pregunta inmediatamente después de tirar el dado
-                if self.jugadores[self.jugador_elegido].casilla_actual < 36:
+                if jugador.casilla_actual < 36:
+                    jugador.casilla_actual += pasos
+                
+                # Penalización
+                if jugador.casilla_actual in self.casillas_penalizacion:
+                    jugador.casilla_actual = max(1, jugador.casilla_actual - 3)
+                
+                # Turbo
+                if jugador.casilla_actual in self.casillas_turbo:
+                    jugador.casilla_actual = min(36, jugador.casilla_actual + 5)
+                
+                # Lanzar pregunta si se mueve (y si hay preguntas cargadas)
+                if 0 < jugador.casilla_actual < 36:
                     if len(self.lista_preguntas) > 0:
                         self.activar_pregunta()
                     
@@ -401,29 +397,35 @@ class OcaGame(arcade.Window):
             self.dibujar_capa_pregunta()
             
         if getattr(self, "dado_animacion_activa", False):
-            cx = self.width // 6
-            cy = self.height // 2
-            
-            arcade.draw_rect_filled(arcade.XYWH(cx, cy, 250, 250), (0, 0, 0, 220))
-            arcade.draw_rect_outline(arcade.XYWH(cx, cy, 250, 250), arcade.color.WHITE, 5)
-            
-            if self.dado_timer > 4.0:
-                valor_mostrar = random.randint(1, 6)
-                texto_dado = "TIRANDO..."
-                color_texto = arcade.color.WHITE
-            else:
-                valor_mostrar = self.dado_valor_final
-                texto_dado = "¡RESULTADO!"
-                color_texto = arcade.color.GOLD
-                
-            if len(self.texturas_dado) == 6:
-                textura_actual = self.texturas_dado[valor_mostrar - 1]
-                arcade.draw_texture_rect(textura_actual, arcade.XYWH(cx, cy, 150, 150))
-            else:
-                arcade.draw_text(str(valor_mostrar), cx, cy - 20, color_texto, 
+                    cx = self.width // 6
+                    cy = self.height // 2
+                    
+                    # Fondo oscuro para el dado
+                    arcade.draw_rect_filled(arcade.XYWH(cx, cy, 250, 250), (0, 0, 0, 220))
+                    arcade.draw_rect_outline(arcade.XYWH(cx, cy, 250, 250), arcade.color.WHITE, 5)
+                    
+                    if self.dado_timer > 4.0:
+                        valor_mostrar = random.randint(1, 6)
+                        texto_dado = "TIRANDO..."
+                        color_texto = arcade.color.WHITE
+                    else:
+                        valor_mostrar = self.dado_valor_final
+                        texto_dado = "¡RESULTADO!"
+                        color_texto = arcade.color.GOLD
+                        
+                    # --- NUEVO: DIBUJAR LA IMAGEN EN LUGAR DEL NÚMERO ---
+                    if len(self.texturas_dado) == 6:
+                        # Obtenemos la textura correspondiente (restamos 1 porque la lista empieza en 0)
+                        textura_actual = self.texturas_dado[valor_mostrar - 1]
+                        # Dibujamos la imagen a un tamaño de 150x150 píxeles
+                        arcade.draw_texture_rect(textura_actual, arcade.XYWH(cx, cy, 150, 150))
+                    else:
+                        # Sistema de seguridad: si alguna imagen no carga, dibuja el número de siempre
+                        arcade.draw_text(str(valor_mostrar), cx, cy - 20, color_texto, 
                                         120, anchor_x="center", anchor_y="center", bold=True)
-            
-            arcade.draw_text(texto_dado, cx, cy - 160, arcade.color.WHITE, 
+                    
+                    # Dibujar el texto ("TIRANDO..." o "¡RESULTADO!")
+                    arcade.draw_text(texto_dado, cx, cy - 160, arcade.color.WHITE, 
                                     24, anchor_x="center", anchor_y="center", bold=True)
 
     def dibujar_error_fatal(self):
