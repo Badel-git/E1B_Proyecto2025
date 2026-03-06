@@ -10,5 +10,17 @@
         "categoria": "Informática",
         "tiradas": 9,
         "fecha": "2026-03-06"
+    },
+    {
+        "nombre": "da",
+        "categoria": "Imagen personal",
+        "tiradas": 10,
+        "fecha": "2026-03-06"
+    },
+    {
+        "nombre": "dfgh",
+        "categoria": "Imagen personal",
+        "tiradas": 13,
+        "fecha": "2026-03-06"
     }
 ]
