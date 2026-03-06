@@ -502,7 +502,7 @@ class OcaGame(arcade.Window):
                 arcade.draw_text("TÚ", posX + dx, posY + dy + 45, arcade.color.WHITE, 14, anchor_x="center", bold=True)
 
         nombres = ["OBRA", "IMAGEN PERSONAL", "INFORMÁTICA", "MADERA"]
-        texto = f"Turno: {nombres[self.jugador_elegido]} - Pulsa ESPACIO" 
+        texto = f"Familia profesional: {nombres[self.jugador_elegido].capitalize()} - Pulsa ESPACIO para tirar el dado" 
         arcade.draw_text(texto, self.width // 2, 20, arcade.color.WHITE, 24, anchor_x="center", bold=True)
 
         arcade.draw_text(f"Jugador: {self.nombre}", 20, self.height - 40, 
