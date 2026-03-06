@@ -109,6 +109,9 @@ class OcaGame(arcade.Window):
         self.dado_timer = 0.0
         self.dado_valor_final = 1
 
+        #Contador de tiradas
+        self.dado_tiradas = 0 
+
     def cargar_textura_ninja(self, url, nombre_temp, es_fondo):
         """Descarga una imagen de internet temporalmente para usarla en el juego y luego borra el archivo."""
         try:
@@ -384,6 +387,7 @@ class OcaGame(arcade.Window):
         if self.estado == ESTADO_JUEGO and key == arcade.key.SPACE:
             if not self.mostrando_pregunta:
                 # --- CAMBIO: LANZAR DADO PERO NO MOVER TODAVÍA ---
+                self.dado_tiradas +=1
                 pasos = dado.tirar()
                 self.dado_animacion_activa = True
                 self.dado_timer = 5.5
@@ -531,6 +535,9 @@ class OcaGame(arcade.Window):
 
         arcade.draw_text(f"Jugador: {self.nombre}", 20, self.height - 40, 
                          arcade.color.WHITE, 22, bold=True)
+        
+        #contador de tiradas visible en tablero
+        arcade.draw_text(f"TIRADAS: {self.dado_tiradas}", 20, self.height - 80, arcade.color.GOLD, 22, bold=True)
 
     def dibujar_capa_pregunta(self):
         """Oscurece el fondo y dibuja la interfaz de preguntas."""
