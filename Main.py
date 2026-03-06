@@ -353,7 +353,7 @@ class OcaGame(arcade.Window):
                 jugador = self.jugadores[self.jugador_elegido] 
                 pasos = dado.tirar()
                 self.dado_animacion_activa = True
-                self.dado_timer = 1.5
+                self.dado_timer = 5.5
                 self.dado_valor_final = pasos
                 
                 if jugador.casilla_actual < 36:
@@ -397,14 +397,14 @@ class OcaGame(arcade.Window):
             self.dibujar_capa_pregunta()
             
         if getattr(self, "dado_animacion_activa", False):
-                    cx = self.width // 4
+                    cx = self.width // 6
                     cy = self.height // 2
                     
                     # Fondo oscuro para el dado
                     arcade.draw_rect_filled(arcade.XYWH(cx, cy, 250, 250), (0, 0, 0, 220))
                     arcade.draw_rect_outline(arcade.XYWH(cx, cy, 250, 250), arcade.color.WHITE, 5)
                     
-                    if self.dado_timer > 0.5:
+                    if self.dado_timer > 4.0:
                         valor_mostrar = random.randint(1, 6)
                         texto_dado = "TIRANDO..."
                         color_texto = arcade.color.WHITE
