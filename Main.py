@@ -71,7 +71,14 @@ class OcaGame(arcade.Window):
         self.textura_casilla_36 = arcade.load_texture("assets/img/icons/BotonFin.png")
 
         print("Cargando recursos... ⚙️")
-        self.cargar_textura_ninja(URL_FONDO, "temp_fondo.jpg", es_fondo=True)
+# --- CARGA DEL FONDO EN LOCAL ---
+        ruta_fondo = os.path.join("assets", "img", "fondo", "FondoNuevo.jpg")
+        try:
+            self.background = arcade.load_texture(ruta_fondo)
+            self.usar_imagen_fondo = True
+        except Exception as e:
+            print(f"Error cargando la imagen de fondo: {e}")
+            self.background_color = arcade.color.GRAY
         self.texturas_dado = []
         for i in range(1, 7):
             ruta_dado = f"assets/img/Dados/cara{i}.png"
