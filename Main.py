@@ -38,6 +38,7 @@ PLAYER_IMAGES = [
 
 # --- PANTALLAS DEL JUEGO (Estados) ---
 # Usamos números simples para decirle al juego qué "pantalla" debe mostrar en cada momento.
+ESTADO_INSTRUCCIONES = -1 # Pantalla -1: Instrucciones para jugar (solo si el fondo no se carga).
 ESTADO_MENU = 0        # Pantalla 0: Menú principal.
 ESTADO_JUEGO = 1       # Pantalla 1: El tablero de juego.
 ESTADO_NOMBRE = 2      # Pantalla 2: Donde escribes tu nombre.
@@ -87,7 +88,7 @@ class OcaGame(arcade.Window):
         
         # Hacemos que la flechita del ratón se vea en la pantalla.
         self.set_mouse_visible(True)        
-        self.estado = ESTADO_MENU           # Le decimos que empiece enseñando el Menú Principal (0).
+        self.estado = ESTADO_INSTRUCCIONES           # Le decimos que empiece enseñando el Menú de Instrucciones (-1).
         self.jugador_elegido = None         # Todavía no sabemos qué ficha va a elegir el jugador.
         self.nombre = ""                    # Dejamos un texto en blanco preparado para guardar su nombre.
         self.tiempo_error = 0.0             # Un reloj a cero por si hay un error y tenemos que cerrar.
@@ -449,7 +450,12 @@ class OcaGame(arcade.Window):
                     self.nombre += text # Añade esa letra a tu nombre.
 
     def on_key_press(self, key, modifiers):
-        # El ordenador detecta si aprietas teclas de control especial (Enter, Espacio, Escape...).
+        # Si estamos viendo las instrucciones, cualquier tecla nos lleva al menú principal.
+        if self.estado == ESTADO_INSTRUCCIONES:
+            self.estado = ESTADO_MENU
+            return
+        
+                # El ordenador detecta si aprietas teclas de control especial (Enter, Espacio, Escape...).
         if self.estado == ESTADO_ERROR_FATAL:
             return
 
@@ -549,6 +555,8 @@ class OcaGame(arcade.Window):
             arcade.draw_texture_rect(self.background, arcade.XYWH(self.width / 2, self.height / 2, self.width, self.height))
 
         # Dependiendo del número de pantalla (estado), llama a un ayudante distinto del pintor para dibujar la escena.
+        if self.estado == ESTADO_INSTRUCCIONES:
+            self.dibujar_instrucciones()
         if self.estado == ESTADO_ERROR_FATAL:
             self.dibujar_error_fatal()
         elif self.estado == ESTADO_MENU:
@@ -770,6 +778,31 @@ class OcaGame(arcade.Window):
             arcade.draw_text(texto, self.width // 2, y, arcade.color.WHITE, 22, anchor_x="center")
             y -= 35 # Va bajando el lápiz como si saltara de renglón en un cuaderno.
         arcade.draw_text("Pulsa ENTER para volver al menú", self.width // 2, 100, arcade.color.GRAY, 20, anchor_x="center")
+    
+    def dibujar_instrucciones(self):
+        # Fondo oscuro para leer bien
+        arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), (0, 0, 0, 200))
+        
+        cx = self.width // 2
+        cy = self.height // 2
+
+        arcade.draw_text("REGLAS DE LA OCA MASTER", cx, cy + 250, arcade.color.GOLD, 50, anchor_x="center", bold=True)
+
+        reglas = [
+            "1. Elige tu familia profesional para comenzar.",
+            "2. Pulsa ESPACIO para tirar el dado y avanzar.",
+            "3. Si fallas la pregunta, te quedas en el mismo sitio.",
+            "4. Casillas AZULES: Turbo (Avanzas 5 puestos).",
+            "5. Casillas ROJAS: Penalización (Retrocedes 3 puestos).",
+            "6. El objetivo es llegar a la casilla 36 en el menor número de tiradas posible."
+        ]
+
+        y_text = cy + 100
+        for linea in reglas:
+            arcade.draw_text(linea, cx, y_text, arcade.color.WHITE, 22, anchor_x="center")
+            y_text -= 45
+
+        arcade.draw_text("PULSA CUALQUIER TECLA PARA EMPEZAR", cx, cy - 250, arcade.color.GRAY, 25, anchor_x="center", bold=True)
 
 # =====================================================================
 # 6. EL BOTÓN DE ENCENDIDO
