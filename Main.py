@@ -102,6 +102,9 @@ class OcaGame(arcade.Window):
         # Cargamos en la tarjeta gráfica el dibujo del botón de Start y de Fin.
         self.textura_casilla_1 = arcade.load_texture("assets/img/icons/BotonStart.png")
         self.textura_casilla_36 = arcade.load_texture("assets/img/icons/BotonFin.png")
+        # Estas imágenes se usarán automáticamente en las casillas definidas como penalización o turbo
+        self.textura_penalizacion = arcade.load_texture("assets/img/icons/Penalizacion.png")
+        self.textura_turbo = arcade.load_texture("assets/img/icons/Turbo.png")
 
         print("Cargando recursos... ⚙️")   # Un mensaje para nosotros en la consola de comandos.
         
@@ -425,7 +428,7 @@ class OcaGame(arcade.Window):
                                 jugador.casilla_actual = max(1, jugador.casilla_actual - 3)
                             # Si cayó en turbo, avanza 5, asegurándonos de no pasarse de la meta (máximo 36).
                             if jugador.casilla_actual in self.casillas_turbo:
-                                jugador.casilla_actual = min(36, jugador.casilla_actual + 5)
+                                jugador.casilla_actual = min(36, jugador.casilla_actual + 3)
                         # Si hiciste clic en el botón equivocado...
                         else:
                             self.resultado_quiz = "INCORRECTO" # Marcamos fallo y te quedas sin mover.
@@ -664,6 +667,14 @@ class OcaGame(arcade.Window):
             # Si es la meta (36), pon su foto especial.
             elif num == 36 and self.textura_casilla_36:
                 arcade.draw_texture_rect(self.textura_casilla_36, rect_casilla)
+            # Comprobar si la casilla es de penalización
+            elif num in self.casillas_penalizacion and self.textura_penalizacion:
+                # Dibujar imagen de penalización en esa casilla
+                arcade.draw_texture_rect(self.textura_penalizacion, rect_casilla)
+            # NUEVO: comprobar si la casilla es de turbo
+            elif num in self.casillas_turbo and self.textura_turbo:
+                # Dibujar imagen de turbo en esa casilla
+                arcade.draw_texture_rect(self.textura_turbo, rect_casilla)
             # Si es cualquier otra...
             else:
                 # Decide qué color toca según si es mala, buena o neutra.
@@ -792,8 +803,8 @@ class OcaGame(arcade.Window):
             "1. Elige tu familia profesional para comenzar.",
             "2. Pulsa ESPACIO para tirar el dado y avanzar.",
             "3. Si fallas la pregunta, te quedas en el mismo sitio.",
-            "4. Casillas AZULES: Turbo (Avanzas 5 puestos).",
-            "5. Casillas ROJAS: Penalización (Retrocedes 3 puestos).",
+            "4. Casillas Erasmus: Turbo (Avanzas 3 puestos).",
+            "5. Casillas Expulsión: Penalización (Retrocedes 3 puestos).",
             "6. El objetivo es llegar a la casilla 36 en el menor número de tiradas posible."
         ]
 
