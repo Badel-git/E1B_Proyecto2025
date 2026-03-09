@@ -1,0 +1,25 @@
+{
+  "categoria": "Madera",
+  "items": [
+    { "pregunta": "¿Qué herramienta corta madera?", "opciones": ["Martillo", "Sierra", "Nivel", "Brocha"], "correcta": "B" },
+    { "pregunta": "¿Qué herramienta sirve para lijar?", "opciones": ["Clavo", "Taladro", "Lija", "Pala"], "correcta": "C" },
+    { "pregunta": "¿Qué adhesivo une madera?", "opciones": ["Arena", "Cola blanca", "Yeso", "Agua"], "correcta": "B" },
+    { "pregunta": "¿Qué herramienta perfora madera?", "opciones": ["Martillo", "Nivel", "Taladro", "Rodillo"], "correcta": "C" },
+    { "pregunta": "¿Qué protege contra humedad?", "opciones": ["Barniz", "Cartón", "Papel", "Arena"], "correcta": "A" },
+    { "pregunta": "¿Qué mide ángulos rectos?", "opciones": ["Brocha", "Escuadra", "Lija", "Pala"], "correcta": "B" },
+    { "pregunta": "¿Qué sujeta piezas al encolar?", "opciones": ["Nivel", "Rodillo", "Sargento", "Martillo"], "correcta": "C" },
+    { "pregunta": "¿Qué herramienta talla madera?", "opciones": ["Formón", "Pala", "Hormigonera", "Nivel"], "correcta": "A" },
+    { "pregunta": "¿Qué acabado da brillo?", "opciones": ["Agua", "Barniz", "Arena", "Yeso"], "correcta": "B" },
+    { "pregunta": "¿Qué tablero son láminas encoladas?", "opciones": ["Cartón", "Yeso", "Contrachapado", "Vidrio"], "correcta": "C" },
+    { "pregunta": "¿Qué herramienta marca medidas largas?", "opciones": ["Lija", "Metro", "Pala", "Rodillo"], "correcta": "B" },
+    { "pregunta": "¿Qué herramienta eléctrica corta recto?", "opciones": ["Brocha", "Espátula", "Sierra circular", "Martillo"], "correcta": "C" },
+    { "pregunta": "¿Qué une piezas metálicamente?", "opciones": ["Clavo", "Arena", "Yeso", "Pintura"], "correcta": "A" },
+    { "pregunta": "¿Qué rellena imperfecciones?", "opciones": ["Agua", "Masilla", "Arena", "Cemento"], "correcta": "B" },
+    { "pregunta": "¿Qué elimina astillas?", "opciones": ["Clavado", "Perforado", "Lijado", "Corte"], "correcta": "C" },
+    { "pregunta": "¿Qué madera es resistente en muebles?", "opciones": ["Cartón", "Yeso", "Roble", "Plástico"], "correcta": "C" },
+    { "pregunta": "¿Qué equipo protege ojos?", "opciones": ["Gafas seguridad", "Sombrero", "Bufanda", "Sandalias"], "correcta": "A" },
+    { "pregunta": "¿Qué herramienta hace ranuras?", "opciones": ["Pala", "Fresadora", "Nivel", "Rodillo"], "correcta": "B" },
+    { "pregunta": "¿Qué herramienta clava clavos?", "opciones": ["Sierra", "Taladro", "Martillo", "Lija"], "correcta": "C" },
+    { "pregunta": "¿Qué proceso suaviza superficie?", "opciones": ["Corte", "Clavado", "Lijado", "Pegado"], "correcta": "C" }
+  ]
+}
