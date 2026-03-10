@@ -22,8 +22,8 @@ os.chdir(file_path)
 # =====================================================================
 # El texto que saldrá en la barrita de arriba de la ventana del juego.
 SCREEN_TITLE = "La Oca - Versión Master (F11 para Pantalla Completa)"
-# Un enlace de internet por si queremos descargar una imagen de fondo.
-URL_FONDO = "https://i.postimg.cc/2ywynnLw/Fondo-Nuevo.jpg"
+#Fondo corregio, antes era por url y ahora se esta en local
+URL_FONDO = os.path.join("assets", "img", "fondo", "FondoNuevo.jpg")
 
 CELL_SIZE = 120 # El tamaño en píxeles que tendrá cada cuadrado (casilla) del tablero.
 MARGIN = 5      # El espacio en píxeles de separación entre una casilla y otra.
