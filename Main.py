@@ -8,7 +8,6 @@ import random          # Traemos la herramienta para generar cosas al azar (como
 import math            # Traemos la calculadora matemática del ordenador (para medir distancias).
 import json            # Traemos un traductor para poder leer archivos de texto llenos de datos (las preguntas).
 import datetime        # Traemos un reloj y calendario para saber qué día es hoy.
-
 # =====================================================================
 # 2. PREPARAR EL TERRENO (¿Dónde estamos?)
 # =====================================================================
@@ -16,18 +15,15 @@ import datetime        # Traemos un reloj y calendario para saber qué día es h
 file_path = os.path.dirname(os.path.abspath(__file__))
 # Le decimos al ordenador: "Quédate en esta carpeta, todo lo que busques estará aquí".
 os.chdir(file_path)
-
 # =====================================================================
 # 3. REGLAS FIJAS (Constantes que nunca cambian)
 # =====================================================================
 # El texto que saldrá en la barrita de arriba de la ventana del juego.
 SCREEN_TITLE = "La Oca - Versión Master (F11 para Pantalla Completa)"
-#Fondo corregio, antes era por url y ahora se esta en local
-URL_FONDO = os.path.join("assets", "img", "fondo", "FondoNuevo.jpg")
-
+# Un enlace de internet por si queremos descargar una imagen de fondo.
+URL_FONDO = "https://i.postimg.cc/2ywynnLw/Fondo-Nuevo.jpg"
 CELL_SIZE = 120 # El tamaño en píxeles que tendrá cada cuadrado (casilla) del tablero.
 MARGIN = 5      # El espacio en píxeles de separación entre una casilla y otra.
-
 # Creamos una lista con las direcciones (rutas) de los dibujos de las 4 fichas de los jugadores.
 PLAYER_IMAGES = [
     os.path.join("assets", "img", "ficha", "Ficha_obra.png"),
@@ -35,7 +31,6 @@ PLAYER_IMAGES = [
     os.path.join("assets", "img", "ficha", "Ficha_informatica.png"),
     os.path.join("assets", "img", "ficha", "Ficha_madera.png")
 ]
-
 # --- PANTALLAS DEL JUEGO (Estados) ---
 # Usamos números simples para decirle al juego qué "pantalla" debe mostrar en cada momento.
 ESTADO_INSTRUCCIONES = -1 # Pantalla -1: Instrucciones para jugar (solo si el fondo no se carga).
@@ -44,7 +39,6 @@ ESTADO_JUEGO = 1       # Pantalla 1: El tablero de juego.
 ESTADO_NOMBRE = 2      # Pantalla 2: Donde escribes tu nombre.
 ESTADO_ERROR_FATAL = 3 # Pantalla 3: Pantalla de error si algo sale muy mal.
 ESTADO_VICTORIA = 4    # Pantalla 4: Pantalla de celebración final.
-
 # =====================================================================
 # 4. FABRICANDO LAS PIEZAS DEL JUEGO (Clases / Moldes)
 # =====================================================================
@@ -56,7 +50,6 @@ class Dado:
     
 # Usamos el molde para fabricar un dado real que usaremos luego.
 dado = Dado()
-
 # Creamos el "molde" para construir las fichas de los jugadores.
 class Ficha:
     # Esta es la acción que se ejecuta automáticamente al "nacer" una ficha nueva.
@@ -72,7 +65,6 @@ class Ficha:
         # Si la imagen no está en la carpeta, no rompemos el juego, solo avisamos del error.
         except Exception as e:
             print(f"Error carga imagen {ID}: {e}")
-
 # =====================================================================
 # 5. EL JUEGO EN SÍ MISMO (La Ventana Principal)
 # =====================================================================
@@ -98,14 +90,12 @@ class OcaGame(arcade.Window):
         self.background = None              # Caja vacía para el dibujo del fondo.
         self.usar_imagen_fondo = False      # Un interruptor apagado: por ahora no hay fondo.
         self.textura_casilla_1 = None       # Caja vacía para el dibujo de la Salida.
-
         # Cargamos en la tarjeta gráfica el dibujo del botón de Start y de Fin.
         self.textura_casilla_1 = arcade.load_texture("assets/img/icons/BotonStart.png")
         self.textura_casilla_36 = arcade.load_texture("assets/img/icons/BotonFin.png")
         # Estas imágenes se usarán automáticamente en las casillas definidas como penalización o turbo
         self.textura_penalizacion = arcade.load_texture("assets/img/icons/Penalizacion.png")
         self.textura_turbo = arcade.load_texture("assets/img/icons/Turbo.png")
-
         print("Cargando recursos... ⚙️")   # Un mensaje para nosotros en la consola de comandos.
         
         # Buscamos dónde está el archivo del fondo.
@@ -118,7 +108,6 @@ class OcaGame(arcade.Window):
         except Exception as e:
             print(f"Error cargando la imagen de fondo: {e}")
             self.background_color = arcade.color.GRAY 
-
         # Preparamos una lista vacía para guardar las 6 caras del dado.
         self.texturas_dado = []
         # Repetimos esta acción 6 veces (del 1 al 6).
@@ -132,7 +121,6 @@ class OcaGame(arcade.Window):
             # Si falta una imagen, lo ignoramos y seguimos cargando las demás.
             except Exception as e:
                 print(f"Error cargando imagen del dado {i}: {e}")
-
         self.camino = []         # Lista vacía donde apuntaremos dónde va cada casilla.
         self.generar_espiral()   # Llamamos a una orden matemática (más abajo) para que llene esa lista.
         
@@ -143,7 +131,6 @@ class OcaGame(arcade.Window):
         # Listas con los números de las casillas que tienen castigos o premios.
         self.casillas_penalizacion = [9, 18, 26] 
         self.casillas_turbo = [5, 14, 22]        
-
         # Interruptores y datos en blanco para cuando salten las preguntas.
         self.mostrando_pregunta = False  # Ahora mismo no hay preguntas en pantalla.
         self.pregunta_actual = None      # Caja vacía para la pregunta que salga.
@@ -160,7 +147,6 @@ class OcaGame(arcade.Window):
         self.dado_timer = 0.0              # Reloj a cero para la animación.
         self.dado_valor_final = 1          # El número final que tocará.
         self.dado_tiradas = 0              # Cuántas veces hemos pulsado para tirar.
-
     # -----------------------------------------------------------------
     # ACCIONES SECRETAS (Lectura de archivos y descargas)
     # -----------------------------------------------------------------
@@ -184,17 +170,14 @@ class OcaGame(arcade.Window):
         except Exception:
             # Si no hay internet, al menos pon un fondo gris.
             if es_fondo: self.background_color = arcade.color.GRAY
-
     def cargar_preguntas_json(self):
         # Esta acción saca las preguntas del archivo de texto.
         self.lista_preguntas = []
         ruta_json = os.path.join("assets", "preguntas.json")
-
         # Comprueba: "¿Existe este archivo en el ordenador?". Si no, rompe el juego con un Error Fatal.
         if not os.path.exists(ruta_json):
             self.estado = ESTADO_ERROR_FATAL 
             return # Se detiene aquí, no sigue leyendo.
-
         try:
             # Abre el archivo como si fuera un libro, preparado para leer tildes y ñ (utf-8).
             with open(ruta_json, "r", encoding="utf-8") as archivo:
@@ -209,12 +192,10 @@ class OcaGame(arcade.Window):
             else:
                 # Nos avisa de que todo fue bien.
                 print(f"[OK] Se han cargado {len(self.lista_preguntas)} categorías de preguntas.")
-
         except Exception as e:
             # Si algo falló al leer el texto (estaba mal escrito), salta un error y bloquea el juego.
             print(f"[ERROR] Fallo al leer el JSON: {e}. Activando Modo Oca Clásica.")
             self.estado = ESTADO_ERROR_FATAL 
-
     def cargar_ranking(self):
         # Acción para leer la lista de ganadores.
         ruta_ranking = os.path.join("assets", "ranking.json")
@@ -251,7 +232,6 @@ class OcaGame(arcade.Window):
                 json.dump(ranking, archivo, indent=4, ensure_ascii=False)
         except Exception as e:
             print(f"Error al guardar puntuación: {e}")
-
     def obtener_top_10(self):
         # Acción para sacar solo a los 10 mejores jugadores.
         ranking = self.cargar_ranking()
@@ -259,7 +239,6 @@ class OcaGame(arcade.Window):
         ranking.sort(key=lambda x: x['tiradas'])
         # Recorta la lista y nos da solo los de la posición 0 a la 9 (los 10 primeros).
         return ranking[:10]
-
     # -----------------------------------------------------------------
     # MATEMÁTICAS (Cálculo de posiciones en la pantalla)
     # -----------------------------------------------------------------
@@ -295,7 +274,6 @@ class OcaGame(arcade.Window):
                 if n > total_casillas: break
                 self.camino.append((col_inicio, i, n)); n += 1
             col_inicio += 1
-
     def obtener_offsets(self):
         # Esta acción calcula el centro exacto de TU monitor (ya que cada uno tiene un monitor distinto).
         tablero_ancho = 6 * (CELL_SIZE + MARGIN)
@@ -304,7 +282,6 @@ class OcaGame(arcade.Window):
         off_x = (self.width - tablero_ancho) // 2
         off_y = (self.height // 2) + (tablero_alto // 2) - CELL_SIZE - 110
         return off_x, off_y
-
     def obtener_coordenadas_casilla(self, numero_casilla):
         # Esta acción averigua dónde está exactamente una casilla concreta (para mover la ficha allí).
         if numero_casilla == 0:
@@ -319,7 +296,6 @@ class OcaGame(arcade.Window):
                 y = off_y - fila * (CELL_SIZE + MARGIN) + CELL_SIZE / 2
                 return x, y
         return 0, 0 # Si no la encuentra, devuelve 0,0 por seguridad.
-
     def activar_pregunta(self):
         # Esta acción saca la tarjeta de preguntas en la pantalla.
         self.mostrando_pregunta = True  # Enciende la señal para que se dibuje la pregunta.
@@ -329,7 +305,6 @@ class OcaGame(arcade.Window):
         categorias = ["Obra", "Imagen personal", "Informática", "Madera"]
         # Averigua a qué profesión pertenece la ficha con la que estás jugando.
         categoria_elegida = categorias[self.jugador_elegido]
-
         preguntas_de_esta_categoria = []
         # Rebusca en la gran lista de preguntas.
         for bloque in self.lista_preguntas:
@@ -338,12 +313,38 @@ class OcaGame(arcade.Window):
                 preguntas_de_esta_categoria = bloque.get("items", [])
                 break # Deja de buscar.
         
-        # Si encontró preguntas...
+        # 3. Elegimos una pregunta al azar SOLO de esos "items"
         if preguntas_de_esta_categoria:
-            # Escoge una completamente al azar.
-            self.pregunta_actual = random.choice(preguntas_de_esta_categoria)
-        # Si hubo un error y no hay preguntas...
+            # --- INICIO MODIFICACIÓN: OPCIÓN PRO (BARAJAR RESPUESTAS) ---
+            # Cogemos la pregunta original
+            pregunta_original = random.choice(preguntas_de_esta_categoria)
+            
+            # Hacemos una copia exacta para no ensuciar la memoria del juego
+            self.pregunta_actual = {
+                "pregunta": pregunta_original["pregunta"],
+                "opciones": pregunta_original["opciones"].copy(),
+                "correcta": pregunta_original["correcta"]
+            }
+            
+            # 1. Traducimos la letra correcta (ej: "A") a un número (0) para saber qué texto es el ganador
+            mapa_indices = {"A": 0, "B": 1, "C": 2, "D": 3}
+            letras_inversas = ["A", "B", "C", "D"]
+            
+            idx_original = mapa_indices.get(self.pregunta_actual["correcta"], 0)
+            texto_ganador = self.pregunta_actual["opciones"][idx_original]
+            
+            # 2. Barajamos las opciones (mezclamos los textos)
+            random.shuffle(self.pregunta_actual["opciones"])
+            
+            # 3. Buscamos en qué posición ha caído el texto ganador tras barajar
+            nuevo_idx = self.pregunta_actual["opciones"].index(texto_ganador)
+            
+            # 4. Actualizamos la letra correcta a su nueva posición (A, B, C o D)
+            self.pregunta_actual["correcta"] = letras_inversas[nuevo_idx]
+            # --- FIN MODIFICACIÓN: OPCIÓN PRO ---
+            
         else:
+            # Plan de emergencia (nunca debería ocurrir gracias a los candados)
             # Crea una pregunta falsa de error para que el juego no estalle.
             self.pregunta_actual = {
                 "pregunta": f"Error: No se encontraron preguntas para {categoria_elegida}", 
@@ -364,7 +365,6 @@ class OcaGame(arcade.Window):
             x = cx - (ancho_btn // 2) # Centra el botón horizontalmente.
             # Guarda la posición y tamaño exacto del botón en la lista.
             self.botones_rects.append((x, y, ancho_btn, alto_btn))
-
     # -----------------------------------------------------------------
     # EL VIGILANTE (Acciones cuando tocas el ratón o el teclado)
     # -----------------------------------------------------------------
@@ -374,7 +374,6 @@ class OcaGame(arcade.Window):
         # Si estamos en pantalla de error fatal, ignoramos tus clics por completo.
         if self.estado == ESTADO_ERROR_FATAL:
             return
-
         # Si estamos en el Menú Inicial...
         if self.estado == ESTADO_MENU:
             # Revisa las 4 imágenes de las fichas en la pantalla.
@@ -398,7 +397,6 @@ class OcaGame(arcade.Window):
                 mapa_letras = {"A": 0, "B": 1, "C": 2, "D": 3}
                 # Averiguamos qué botón (0,1,2 o 3) es el que tiene la respuesta correcta.
                 idx_correcto = mapa_letras.get(self.pregunta_actual["correcta"], 0)
-
                 # Comprobamos los 4 rectángulos que dibujamos antes para las respuestas.
                 for i, rect in enumerate(self.botones_rects):
                     # Extraemos izquierda, abajo, ancho y alto de ese botón.
@@ -422,7 +420,6 @@ class OcaGame(arcade.Window):
                             # Si no ha llegado a la meta, simplemente se mueve.
                             else:
                                 jugador.casilla_actual += self.dado_valor_final
-
                             # Si cayó en casilla de castigo, retrocede 3, pero asegurándonos de no salirse del tablero (mínimo 1).
                             if jugador.casilla_actual in self.casillas_penalizacion:
                                 jugador.casilla_actual = max(1, jugador.casilla_actual - 3)
@@ -438,12 +435,10 @@ class OcaGame(arcade.Window):
                 self.mostrando_pregunta = False
                 self.tiempo_feedback = 0 
                 self.resultado_quiz = None
-
     def on_text(self, text):
         # El ordenador detecta que has tecleado una letra física.
         if self.estado == ESTADO_ERROR_FATAL:
             return
-
         # Si estamos en la pantalla de escribir tu nombre...
         if self.estado == ESTADO_NOMBRE:
             # Si tu nombre tiene menos de 15 letras (para que no se salga de la pantalla)...
@@ -451,7 +446,6 @@ class OcaGame(arcade.Window):
                 # Si es una letra normal (no el botón Ctrl o Enter)...
                 if text.isprintable() and text != '\r':
                     self.nombre += text # Añade esa letra a tu nombre.
-
     def on_key_press(self, key, modifiers):
         # Si estamos viendo las instrucciones, cualquier tecla nos lleva al menú principal.
         if self.estado == ESTADO_INSTRUCCIONES:
@@ -461,7 +455,6 @@ class OcaGame(arcade.Window):
                 # El ordenador detecta si aprietas teclas de control especial (Enter, Espacio, Escape...).
         if self.estado == ESTADO_ERROR_FATAL:
             return
-
         # Si estás en la pantalla de pedir nombre...
         if self.estado == ESTADO_NOMBRE:
             # Si pulsas ENTER, comprueba si has escrito algo, si no pone "Jugador 1" y empieza el juego.
@@ -502,14 +495,12 @@ class OcaGame(arcade.Window):
                 self.mostrando_pregunta = False
                 self.tiempo_feedback = 0
                 self.resultado_quiz = None
-
             # Si estás en la pantalla de que ya ganaste, pulsar ENTER reinicia todo el juego.
             if self.estado == ESTADO_VICTORIA and key == arcade.key.ENTER:
                 self.estado = ESTADO_MENU
                 self.contador_tiradas = 0
                 for j in self.jugadores: 
                     j.casilla_actual = 0
-
     # -----------------------------------------------------------------
     # EL RELOJ INTERNO (Actualizar temporizadores)
     # -----------------------------------------------------------------
@@ -523,7 +514,6 @@ class OcaGame(arcade.Window):
             if self.tiempo_error >= 10.0:
                 self.close()  
             return 
-
         # Si hay un resultado de Correcto/Incorrecto en pantalla...
         if self.resultado_quiz is not None:
             self.tiempo_feedback += delta_time
@@ -532,18 +522,15 @@ class OcaGame(arcade.Window):
                 self.mostrando_pregunta = False
                 self.tiempo_feedback = 0
                 self.resultado_quiz = None
-
         # Si el dado está haciendo su efecto visual de dar vueltas...
         if getattr(self, "dado_animacion_activa", False):
             self.dado_timer -= delta_time # Va restando tiempo de la cuenta atrás de 5.5 segundos.
         # Si el reloj del dado llegó a cero, apaga el efecto visual del dado.
         if self.dado_timer <= 0:
                 self.dado_animacion_activa = False
-
         # Si estás en la victoria, este reloj ayuda a animar el latido del texto más grande y pequeño.
         if self.estado == ESTADO_VICTORIA:
             self.animacion_victoria += delta_time
-
     # -----------------------------------------------------------------
     # EL PINTOR (Acciones puramente visuales, dibujar la pantalla)
     # -----------------------------------------------------------------
@@ -556,7 +543,6 @@ class OcaGame(arcade.Window):
         # Si hay una imagen de fondo, pégala gigante cubriendo toda la pantalla.
         if self.usar_imagen_fondo and self.background:
             arcade.draw_texture_rect(self.background, arcade.XYWH(self.width / 2, self.height / 2, self.width, self.height))
-
         # Dependiendo del número de pantalla (estado), llama a un ayudante distinto del pintor para dibujar la escena.
         if self.estado == ESTADO_INSTRUCCIONES:
             self.dibujar_instrucciones()
@@ -607,9 +593,7 @@ class OcaGame(arcade.Window):
             # Escribe la palabra "TIRANDO" o "RESULTADO".
             arcade.draw_text(texto_dado, cx, cy - 160, arcade.color.WHITE, 
                                     24, anchor_x="center", anchor_y="center", bold=True)
-
     # Las siguientes son las "órdenes de pintura" de cada escena específica. Son puramente visuales.
-
     def dibujar_error_fatal(self):
         # Pinta la pantalla toda de negro.
         arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), arcade.color.BLACK)
@@ -622,7 +606,6 @@ class OcaGame(arcade.Window):
         segundos_restantes = max(0, 10 - int(self.tiempo_error))
         arcade.draw_text(f"El juego se cerrará automáticamente en {segundos_restantes}...", self.width // 2, self.height // 2 - 100,
                          arcade.color.GRAY, 20, anchor_x="center")
-
     def dibujar_menu(self):                
         # Dibuja un cuadrado negro semitransparente como velo oscuro (como ponerle gafas de sol a la pantalla).
         arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), (0, 0, 0, 150))
@@ -639,7 +622,6 @@ class OcaGame(arcade.Window):
                 arcade.draw_texture_rect(self.jugadores[i].texture, arcade.XYWH(cx, cy, 120, 120))
             # Dibuja el nombre de la profesión debajo de su foto.
             arcade.draw_text(nombres[i], cx, cy - 100, arcade.color.WHITE, 18, anchor_x="center", bold=True)
-
     def dibujar_ingreso_nombre(self):
         # Pantalla con velo oscuro.
         arcade.draw_rect_filled(arcade.LBWH(0, 0, self.width, self.height), (0, 0, 0, 180))
@@ -652,7 +634,6 @@ class OcaGame(arcade.Window):
         
         arcade.draw_text("Pulsa ENTER para comenzar", self.width // 2, self.height // 2 - 100,
                          arcade.color.GRAY, 20, anchor_x="center")
-
     def dibujar_tablero_y_fichas(self):
         off_x, off_y = self.obtener_offsets() # Pide el centro exacto de la pantalla.
         
@@ -694,7 +675,6 @@ class OcaGame(arcade.Window):
             # Dibuja el número dentro (salvo en salida y meta).
             if num not in (1, 36):
                 arcade.draw_text(str(num), x + CELL_SIZE/2, y + CELL_SIZE/2, arcade.color.BLACK, 24, anchor_x="center", bold=True)
-
         # Ahora pinta a los jugadores.
         for i, jugador in enumerate(self.jugadores):
             # Solo dibuja al jugador activo actual (la idea original quizá era multijugador, pero aquí solo dibujamos al tuyo).
@@ -707,34 +687,28 @@ class OcaGame(arcade.Window):
                 
                 # Ponle la palabra "TÚ" debajo para que sepas dónde andas.
                 arcade.draw_text("TÚ", posX + dx, posY + dy + 45, arcade.color.WHITE, 14, anchor_x="center", bold=True)
-
         # Letreros informativos por arriba y por abajo en la pantalla.
         nombres = ["OBRA", "IMAGEN PERSONAL", "INFORMÁTICA", "MADERA"]
         texto = f"Familia profesional: {nombres[self.jugador_elegido].capitalize()} - Pulsa ESPACIO para tirar el dado" 
         arcade.draw_text(texto, self.width // 2, 20, arcade.color.WHITE, 24, anchor_x="center", bold=True)
-
         arcade.draw_text(f"Jugador: {self.nombre}", 20, self.height - 40, 
                          arcade.color.WHITE, 22, bold=True)
         
-        arcade.draw_text(f"TIRADAS: {self.dado_tiradas}", 20, self.height - 80, arcade.color.GOLD, 22, bold=True)
-
+        arcade.draw_text(f"TIRADAS: {self.dado_tiradas}", 20, self.height - 80, arcade.color.WHITE, 22, bold=True)
     def dibujar_capa_pregunta(self):
         # Pinta un velo súper oscuro (230 de 255) para tapar el tablero y que nos centremos en la pregunta.
         arcade.draw_lbwh_rectangle_filled(0, 0, self.width, self.height, (0, 0, 0, 230))
         cx = self.width // 2
         cy = self.height // 2
-
         # Dibuja el texto de la pregunta, permitiendo saltos de línea si es muy larga.
         arcade.draw_text(
             self.pregunta_actual["pregunta"], cx, cy + 150, arcade.color.WHITE,
             30, anchor_x="center", anchor_y="center", width=900, align="center", multiline=True, bold=True
         )
-
         letras = ["A", "B", "C", "D"] # Para que salgan los incisos.
         colores_base = [arcade.color.BLUE, arcade.color.RED, arcade.color.AMBER, arcade.color.GREEN] # Colores chulos de los botones.
         mapa_letras = {"A": 0, "B": 1, "C": 2, "D": 3}
         idx_correcto = mapa_letras.get(self.pregunta_actual["correcta"], 0) # Saber cuál es la letra ganadora.
-
         # Pinta los 4 botones.
         for i, rect in enumerate(self.botones_rects):
             x, y, w, h = rect
@@ -756,18 +730,15 @@ class OcaGame(arcade.Window):
                 color_texto = arcade.color.BLACK
             else:
                 color_texto = arcade.color.WHITE
-
             # Pega el texto de la respuesta (A, B, C o D) dentro de su botón correspondiente.
             texto_op = f"{letras[i]}) {self.pregunta_actual['opciones'][i]}"
             arcade.draw_text(texto_op, x + w / 2, y + h / 2, color_texto, 18, anchor_x="center", anchor_y="center")
-
         # Si ya has respondido, saca un letrero grandote diciendo si acertaste o no.
         if self.resultado_quiz:
             texto_res = "¡CORRECTO!" if self.resultado_quiz == "CORRECTO" else "¡FALLASTE!"
             color_res = arcade.color.GREEN if self.resultado_quiz == "CORRECTO" else arcade.color.RED
             
             arcade.draw_text(texto_res, cx, cy + 300, color_res, 40, anchor_x="center", bold=True)
-
     
     def dibujar_victoria(self):
         # Velo súper oscuro.
@@ -796,9 +767,7 @@ class OcaGame(arcade.Window):
         
         cx = self.width // 2
         cy = self.height // 2
-
         arcade.draw_text("REGLAS DE LA OCA MASTER", cx, cy + 250, arcade.color.GOLD, 50, anchor_x="center", bold=True)
-
         reglas = [
             "1. Elige tu familia profesional para comenzar.",
             "2. Pulsa ESPACIO para tirar el dado y avanzar.",
@@ -807,14 +776,11 @@ class OcaGame(arcade.Window):
             "5. Casillas Expulsión: Penalización (Retrocedes 3 puestos).",
             "6. El objetivo es llegar a la casilla 36 en el menor número de tiradas posible."
         ]
-
         y_text = cy + 100
         for linea in reglas:
             arcade.draw_text(linea, cx, y_text, arcade.color.WHITE, 22, anchor_x="center")
             y_text -= 45
-
         arcade.draw_text("PULSA CUALQUIER TECLA PARA EMPEZAR", cx, cy - 250, arcade.color.GRAY, 25, anchor_x="center", bold=True)
-
 # =====================================================================
 # 6. EL BOTÓN DE ENCENDIDO
 # =====================================================================
@@ -822,7 +788,6 @@ class OcaGame(arcade.Window):
 def main():
     OcaGame()     # Saca la caja fuerte de nuestro juego (la crea).
     arcade.run()  # Gira la llave: enciende el motor de PyArcade para que nunca se cierre sola.
-
 # Esto es un pestillo de seguridad típico de Python. 
 # Dice: "Solo dale al botón de encendido si alguien hizo doble clic directamente en mí".
 if __name__ == "__main__":
